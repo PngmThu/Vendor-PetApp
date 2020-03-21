@@ -5,14 +5,15 @@ import {
   Dimensions,
   StatusBar,
   KeyboardAvoidingView,
-  Image,
-  View
+  Picker,
+  View,
+  Text
 } from "react-native";
-import { Block, Checkbox, Text, theme } from "galio-framework";
+import { Block, Checkbox, theme } from "galio-framework";
 
 import { Button, 
   Icon, 
-  Input } from "../components";
+  Input, Select } from "../components";
 import { Images, argonTheme } from "../constants";
 import { TouchableOpacity } from "react-native-gesture-handler";
 
@@ -25,6 +26,7 @@ const { width, height } = Dimensions.get("screen");
 const headerImg = require("../assets/imgs/headerLogin.png");
 
 class Register extends React.Component {
+  state = {address: ""}
   render() {
     const { navigation } = this.props;
 
@@ -89,6 +91,68 @@ class Register extends React.Component {
                     style={{backgroundColor: '#333333'}}
                   />
                 </Block>
+
+                <Block width={width * 0.9} style={{ marginBottom: 15 }}>
+                  <Input
+                    borderless 
+                    placeholder="Phone number"
+                    iconContent={
+                      <MaterialIcons
+                        size={16}
+                        color={'#5E5454'}
+                        name="phone"
+                        family="ArgonExtra"
+                        style={styles.inputIcons}
+                      />
+                    }
+                    style={{backgroundColor: '#333333'}}
+                  />
+                </Block>
+
+                <Block width={width * 0.9} style={{ marginBottom: 15 }}>
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      backgroundColor: '#333333',
+                      borderRadius: 9
+                    }}>
+                    <View
+                      style={{
+                        width: '100%',
+                        flexDirection: 'row',
+                        flex: 1,
+                        position: 'relative',
+                        alignItems: 'center',
+                        height: 44,
+                        paddingLeft: 15
+                      }}>
+                      <MaterialIcons name="location-on" size={16} color="#5E5454" style={{marginRight: 10}} />
+                      <Picker
+                        selectedValue={this.state.district}
+                        style={{
+                          width: '100%',
+                          paddingBottom: 0,
+                          backgroundColor: 'transparent',
+                          paddingLeft: 0,
+                          transform: [{scaleX: 0.77}, {scaleY: 0.77}],
+                          position: 'absolute',
+                          color: "#cccccc"
+                        }}
+                        itemStyle={{
+                          backgroundColor:"#000000"
+                        }}
+                        onValueChange={(itemValue, itemIndex) =>
+                          this.setState({district: itemValue})
+                        }>
+                        <Picker.Item label="Address" value="" />
+                        <Picker.Item label="Java" value="java" />
+                        <Picker.Item label="JavaScript" value="js" />
+                      </Picker>
+                    </View>
+                  </View>
+                </Block>
+
                 <Block width={width * 0.9} style={{ marginBottom: 15 }}>
                   <Input
                     password

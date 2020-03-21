@@ -3,7 +3,7 @@ import { Image } from 'react-native';
 import { AppLoading } from 'expo';
 import { Asset } from 'expo-asset';
 import { Block, GalioProvider } from 'galio-framework';
-
+import * as Font from 'expo-font';
 import Screens from './navigation/Screens';
 import { Images, articles, argonTheme } from './constants';
 
@@ -57,6 +57,10 @@ export default class App extends React.Component {
   }
 
   _loadResourcesAsync = async () => {
+    await Font.loadAsync({
+      'opensans': require('./assets/font/opensans.ttf'),
+      'ITCKRIST': require('./assets/font/ITCKRIST.ttf')
+    })
     return Promise.all([
       ...cacheImages(assetImages),
     ]);

@@ -37,13 +37,13 @@ class DropDown extends React.Component {
       <ModalDropdown
         style={modalStyles}
         onSelect={this.handleOnSelect}
+        options={["option1", "option2"]}
         dropdownStyle={styles.dropdown}
-        dropdownTextStyle={{paddingLeft:16, fontSize:12}}
+        dropdownTextStyle={{paddingLeft:16, fontSize:16}}
         {...props}>
-        <Block flex row middle space="between">
-          <Text size={12} style={textStyles}>{this.state.value}</Text>
+        {/* <Block flex row middle space="between">
           <Icon name={iconName || "nav-down"} family={iconFamily || "ArgonExtra"} size={iconSize || 10} color={iconColor || argonTheme.COLORS.WHITE} />
-        </Block>
+        </Block> */}
       </ModalDropdown>
     )
   }
@@ -60,25 +60,29 @@ DropDown.propTypes = {
 
 const styles = StyleSheet.create({
   qty: {
-    width: 100,
+    width: "100%",
+    height: 44,
     backgroundColor: argonTheme.COLORS.DEFAULT,
     paddingHorizontal: 16,
     paddingTop: 10,
     paddingBottom:9.5,
-    borderRadius: 4,
+    borderRadius: 9,
     shadowColor: "rgba(0, 0, 0, 0.1)",
-    shadowOffset: { width: 0, height: 2 },
-    shadowRadius: 4,
-    shadowOpacity: 1,
+    shadowOffset: { width: 0, height: 1 },
+    shadowRadius: 2,
+    shadowOpacity: 0.05,
   },
   text: {
     color: argonTheme.COLORS.WHITE,
-    fontWeight: '600'
+    fontSize: 16
   },
   dropdown: {
     marginTop: 8,
     marginLeft: -16,
-    width: 100,
+    width: "100%",
+    maxHeight: 120,
+    backgroundColor: "#333333",
+    borderRadius: 9,
   },
 });
 

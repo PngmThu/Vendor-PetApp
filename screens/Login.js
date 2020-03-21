@@ -133,7 +133,7 @@ class Login extends React.Component {
                   </Button> */}
                 </Block> 
                 <Block flex middle>
-                  <Button color="primary" style={styles.loginButton} onPress={() => navigation.navigate("Home")}>
+                  <Button color="primary" style={styles.loginButton} onPress={() => navigation.navigate('Home')}>
                     <Text bold size={14} color={argonTheme.COLORS.WHITE}>
                       Login
                     </Text>

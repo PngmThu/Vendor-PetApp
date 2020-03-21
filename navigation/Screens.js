@@ -1,138 +1,55 @@
 import React from "react";
-import { Easing, Animated } from "react-native";
+import { StyleSheet } from "react-native";
 import {
   createStackNavigator,
   createDrawerNavigator,
   createAppContainer
 } from "react-navigation";
 
-import { Block } from "galio-framework";
-
+import { fadeIn } from 'react-navigation-transitions';
+import { createBottomTabNavigator } from 'react-navigation-tabs';
 // screens
 import Home from "../screens/Home";
-import Onboarding from "../screens/Onboarding";
-import Pro from "../screens/Pro";
+import ScheduleDetails from "../screens/ScheduleDetails";
 import Profile from "../screens/Profile";
 import Login from "../screens/Login";
-import Elements from "../screens/Elements";
-import Articles from "../screens/Articles";
 import Register from "../screens/Register";
 import ForgetPassword from "../screens/ForgetPassword"
 // drawer
-import Menu from "./Menu";
-import DrawerItem from "../components/DrawerItem";
+import { MaterialIcons } from '@expo/vector-icons';
 
 // header for screens
-import Header from "../components/Header";
 
-const transitionConfig = (transitionProps, prevTransitionProps) => ({
-  transitionSpec: {
-    duration: 400,
-    easing: Easing.out(Easing.poly(4)),
-    timing: Animated.timing
-  },
-  screenInterpolator: sceneProps => {
-    const { layout, position, scene } = sceneProps;
-    const thisSceneIndex = scene.index;
-    const width = layout.initWidth;
-
-    const scale = position.interpolate({
-      inputRange: [thisSceneIndex - 1, thisSceneIndex, thisSceneIndex + 1],
-      outputRange: [4, 1, 1]
-    });
-    const opacity = position.interpolate({
-      inputRange: [thisSceneIndex - 1, thisSceneIndex, thisSceneIndex + 1],
-      outputRange: [0, 1, 1]
-    });
-    const translateX = position.interpolate({
-      inputRange: [thisSceneIndex - 1, thisSceneIndex],
-      outputRange: [width, 0]
-    });
-
-    const scaleWithOpacity = { opacity };
-    const screenName = "Search";
-
-    if (
-      screenName === transitionProps.scene.route.routeName ||
-      (prevTransitionProps &&
-        screenName === prevTransitionProps.scene.route.routeName)
-    ) {
-      return scaleWithOpacity;
-    }
-    return { transform: [{ translateX }] };
-  }
-});
-
-const ElementsStack = createStackNavigator({
-  Elements: {
-    screen: Elements,
-    navigationOptions: ({ navigation }) => ({
-      header: <Header title="Elements" navigation={navigation} />
-    })
-  }
-},{
-  cardStyle: {
-    backgroundColor: "#F8F9FE"
-  },
-  transitionConfig
-});
-
-const ArticlesStack = createStackNavigator({
-  Articles: {
-    screen: Articles,
-    navigationOptions: ({ navigation }) => ({
-      header: <Header title="Articles" navigation={navigation} />
-    })
-  }
-},{
-  cardStyle: {
-    backgroundColor: "#F8F9FE"
-  },
-  transitionConfig
-});
+const transitionConfig = () => fadeIn();
 
 const ProfileStack = createStackNavigator(
   {
     Profile: {
       screen: Profile,
-      navigationOptions: ({ navigation }) => ({
-        header: (
-          <Header white transparent title="Profile" iconColor={'#FFF'} navigation={navigation} />
-        ),
-        headerTransparent: true
-      })
+      navigationOptions:{
+        header: null
+      }
     }
   },
-  {
-    cardStyle: { backgroundColor: "#FFFFFF" },
-    transitionConfig
-  }
+
 );
 
 const HomeStack = createStackNavigator(
   {
     Home: {
       screen: Home,
-      navigationOptions: ({ navigation }) => ({
-        header: <Header search options title="Home" navigation={navigation} />
-      })
+      navigationOptions: {
+        header: null
+      }
     },
-    Pro: {
-      screen: Pro,
-      navigationOptions: ({ navigation }) => ({
-        header: (
-          <Header left={<Block />} white transparent title="" navigation={navigation} />
-        ),
-        headerTransparent: true
-      })
+    ScheduleDetails: {
+      screen: ScheduleDetails,
+      navigationOptions: {
+        header: null
+      }
     }
   },
-  {
-    cardStyle: {
-      backgroundColor: "#F8F9FE"
-    },
-    transitionConfig
-  }
+
 );
 
 const LoginStack = createStackNavigator(
@@ -156,89 +73,59 @@ const LoginStack = createStackNavigator(
       }
     },
   },
-  {
-    cardStyle: { backgroundColor: "#454545" },
-    transitionConfig
-  }
+
 );
 
-// const RegisterStack = createStackNavigator(
-//   {
-//     Register: {
-//       screen: Register,  
-//       //headerMode: 'none',
-//       navigationOptions: {
-//         header: null,
-//       }
-//     },
-  
-//   },
-//   {
-//     cardStyle: { backgroundColor: "#454545" },
-//     transitionConfig
-//   }
-// );
+const TabNavigator = createBottomTabNavigator({
+  Profile: ProfileStack,
+  Home: HomeStack,
+}, {
+  defaultNavigationOptions: ({ navigation }) => {
+    const route = navigation.state.routeName;
 
-// divideru se baga ca si cum ar fi un ecrna dar nu-i nimic duh
-const AppStack = createDrawerNavigator(
-  {
-    Onboarding: {
-      screen: Onboarding,
-      navigationOptions: {
-        drawerLabel: () => {}
+    return {
+      tabBarIcon: ({ tintColor }) => {
+        const name = {
+          'Home': 'apps',
+          'Profile': 'person'
+        }[route]
+        return <MaterialIcons name={name} color={tintColor} size={22} />
+      },
+      tabBarOptions: {
+        activeBackgroundColor: 'rgba(0,0,0, 0.3)',
+        activeTintColor: 'white',
+        inactiveTintColor: '#fafafa',
+        style: styles.container,
+        tabStyle: styles.tab,
       }
-    },
-    Home: {
-      screen: HomeStack,
-      navigationOptions: navOpt => ({
-        drawerLabel: ({ focused }) => (
-          <DrawerItem focused={focused} title="Home" />
-        )
-      })
-    },
-    Profile: {
-      screen: ProfileStack,
-      navigationOptions: navOpt => ({
-        drawerLabel: ({ focused }) => (
-          <DrawerItem focused={focused} screen="Profile" title="Profile" />
-        )
-      })
-    },
-    Account: {
-      screen: LoginStack,
-      navigationOptions: navOpt => ({
-        drawerLabel: ({ focused }) => (
-          <DrawerItem focused={focused} screen="Login" title="Account" />
-        )
-      })
-    },
-    Elements: {
-      screen: ElementsStack,
-      navigationOptions: navOpt => ({
-        drawerLabel: ({ focused }) => (
-          <DrawerItem focused={focused} screen="Elements" title="Elements" />
-        )
-      })
-    },
-    Articles: {
-      screen: ArticlesStack,
-      navigationOptions: navOpt => ({
-        drawerLabel: ({ focused }) => (
-          <DrawerItem focused={focused} screen="Articles" title="Articles" />
-        )
-      })
-    },
-    // Register: {
-    //   screen: RegisterStack,
-    //   navigationOptions: navOpt => ({
-    //     drawerLabel: ({ focused }) => (
-    //       <DrawerItem focused={focused} screen="Register" title="Register" />
-    //     )
-    //   })
-    // },
-  },
-  Menu
-);
+    }
+  }
+});
 
-const AppContainer = createAppContainer(AppStack);
+const AppContainer = createAppContainer(createStackNavigator({
+  Main: {
+    screen: TabNavigator,
+    navigationOptions: {
+      header: null
+    }
+  },  
+  Account: {
+    screen: LoginStack,  
+    navigationOptions: {
+      header: null,
+    }
+  },
+  }
+));
 export default AppContainer;
+
+const styles = StyleSheet.create({
+  container: {
+    backgroundColor: 'rgba(45,45,45, 0.7)',
+    height: 40,
+    position: 'absolute',
+  },
+  tab: {
+    borderRadius: 20,
+  }
+});
