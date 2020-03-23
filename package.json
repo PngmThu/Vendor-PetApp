@@ -34,7 +34,8 @@
     "react-native-screens": "^2.0.0-beta.10",
     "react-navigation": "^3.11.0",
     "react-navigation-tabs": "^2.8.5",
-    "react-navigation-transitions": "^1.0.12"
+    "react-navigation-transitions": "^1.0.12",
+    "toggle-switch-react-native": "^2.1.0"
   },
   "devDependencies": {
     "babel-preset-expo": "^7.0.0"

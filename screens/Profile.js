@@ -14,11 +14,26 @@ import { argonTheme } from "../constants";
 import { Button, Icon, Input } from "../components";
 import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
 import Notification from '../models/NotificationModel';
-
+import ToggleSwitch from 'toggle-switch-react-native';
+import Popup from '../components/Popup';
 const { width, height } = Dimensions.get("screen");
 
 class Profile extends React.Component {
-  state = {address: ""}
+  state = {
+    address: "", 
+    edit: false, 
+    popUpDialog: false,
+    name: "",
+    email: "",
+    mobile: ""
+  }
+
+  constructor(props){
+    super(props);
+    //console.log(this.props.navigation.state.params);
+    this.logout = this.logout.bind(this);
+    this.clickLogout = this.clickLogout.bind(this);
+  }
 
   register(){
     let noti = new Notification({
@@ -32,14 +47,40 @@ class Profile extends React.Component {
 
     noti.resolveData();
   }
+
+  logout(bool){
+    if(bool){
+      console.log("Logged out!");
+    }
+    this.setState({popUpDialog: false})
+  }
+
+  clickLogout(event){
+    this.setState({popUpDialog: true})
+  }
+
   render() {
     const { navigation } = this.props;
+
+    if(this.state.edit){
+      var updateInfo = <Button style={styles.loginButton} onPress={() => {this.register()}}>
+                          <Text bold size={16} color={argonTheme.COLORS.WHITE}>
+                            Update Info
+                          </Text>
+                        </Button>
+    }
+    else{
+      updateInfo = null
+    }
+
     return (
       <Block flex center style={styles.home}>
         <ImageBackground
           source={require("../assets/imgs/background2.gif")}
           style={{ width, height, zIndex: 1 }}
         >
+        
+        <Popup visible={this.state.popUpDialog} choice={this.logout} question={"Do you want to log out?"}/> 
         <Block flex={0.6} middle >
           <ImageBackground source={require("../assets/imgs/Schedule1.png")} resizeMode='contain' style={styles.headerImage}/>
           <Text color="#ffffff" size={40} style={{ marginLeft: 15, fontFamily: 'ITCKRIST'}}>
@@ -48,14 +89,19 @@ class Profile extends React.Component {
         </Block>
 
           <ScrollView>
-            <Block flex={0.1} row style={styles.action}>
-              <View style={{alignContent:'flex-start', flex:1, flexDirection: 'row'}}>
+            <Block flex={0.1} row style={styles.action} >
+              <View style={{alignContent:'flex-start', flex:1, flexDirection: 'row'}} onTouchStart={(event) => {this.clickLogout(event)}}>
                 <MaterialCommunityIcons name="logout-variant" size={30} style={styles.logoutIcon}></MaterialCommunityIcons>
                 <Text size={20} style={styles.logoutTxt}>Logout</Text>
               </View>
 
               <View style={{justifyContent:'flex-end', flex: 1, flexDirection: 'row'}}>
-                <MaterialCommunityIcons name="logout-variant" size={30} style={styles.editIcon}></MaterialCommunityIcons>
+                <ToggleSwitch
+                  isOn={this.state.edit}
+                  onColor={"#333333"}
+                  offColor={"#999999"}
+                  onToggle={(isOn) => {this.setState({edit: isOn})}}
+                />
                 <Text size={20} style={styles.editTxt}>Edit</Text>
               </View>
             </Block>
@@ -70,6 +116,9 @@ class Profile extends React.Component {
                   <Input
                     borderless
                     placeholder="Your name"
+                    onChangeText={(name) => {this.setState({name})}}
+                    value={this.state.name}
+                    editable={this.state.edit}
                     iconContent={
                       <Icon
                         size={16}
@@ -86,6 +135,9 @@ class Profile extends React.Component {
                   <Input
                     borderless 
                     placeholder="Email"
+                    editable={this.state.edit}
+                    onChangeText={(email) => {this.setState({email})}}
+                    value={this.state.email}
                     iconContent={
                       <Icon
                         size={16}
@@ -103,6 +155,9 @@ class Profile extends React.Component {
                   <Input
                     borderless 
                     placeholder="Phone number"
+                    editable={this.state.edit}
+                    onChangeText={(phone) => {this.setState({phone})}}
+                    value={this.state.phone}
                     iconContent={
                       <MaterialIcons
                         size={16}
@@ -136,22 +191,14 @@ class Profile extends React.Component {
                       }}>
                       <MaterialIcons name="location-on" size={16} color="#ffffff" style={{marginRight: 10}} />
                       <Picker
-                        selectedValue={this.state.district}
-                        style={{
-                          width: '100%',
-                          paddingBottom: 0,
-                          backgroundColor: 'transparent',
-                          paddingLeft: 0,
-                          transform: [{scaleX: 0.77}, {scaleY: 0.77}],
-                          position: 'absolute',
-                          color: "#cccccc"
-                        }}
+                        onValueChange={(address, index) => {this.setState({address})}}
+                        selectedValue={this.state.address}
+                        enabled={this.state.edit}
+                        style={styles.picker}
                         itemStyle={{
                           backgroundColor:"#000000"
                         }}
-                        onValueChange={(itemValue, itemIndex) =>
-                          this.setState({district: itemValue})
-                        }>
+                      >
                         <Picker.Item label="Address" value="" />
                         <Picker.Item label="Java" value="java" />
                         <Picker.Item label="JavaScript" value="js" />
@@ -160,47 +207,11 @@ class Profile extends React.Component {
                   </View>
                 </Block>
 
-                <Block width={width * 0.9} style={{ marginBottom: 15 }}>
-                  <Input
-                    password
-                    viewPass
-                    borderless
-                    placeholder="Password"
-                    iconContent={
-                      <Icon
-                        size={16}
-                        color={'#ffffff'}
-                        name="padlock-unlocked"
-                        family="ArgonExtra"
-                        style={styles.inputIcons}
-                      />
-                    }
-                    style={{backgroundColor: '#333333'}}
-                  />                 
-                </Block> 
-                <Block width={width * 0.9} style={{ marginBottom: 15 }}>
-                  <Input
-                    password
-                    viewPass
-                    borderless
-                    placeholder="Re-enter password"
-                    iconContent={
-                      <Icon
-                        size={16}
-                        color={'#ffffff'}
-                        name="padlock-unlocked"
-                        family="ArgonExtra"
-                        style={styles.inputIcons}
-                      />
-                    }
-                    style={{backgroundColor: '#333333'}}
-                  />            
-                </Block>
-
                 <Block flex={0.1} middle style={{marginBottom: height * 0.1}}>
-                  <Button color="primary" style={styles.loginButton} onPress={() => {this.register()}}>
-                    <Text bold size={14} color={argonTheme.COLORS.WHITE}>
-                      Register
+                  {updateInfo}
+                  <Button style={styles.passwordBtn} onPress={() => {navigation.navigate("ChangePassword")}}>
+                    <Text bold size={16} color={argonTheme.COLORS.WHITE}>
+                      Change Password
                     </Text>
                   </Button>
                 </Block>
@@ -267,6 +278,19 @@ const styles = StyleSheet.create({
     fontFamily: 'opensans',
     marginLeft: 5,
     textAlign: 'left'
+  },
+  passwordBtn: {
+    backgroundColor: "grey",
+    marginTop: 15
+  },
+  picker: {
+    width: '100%',
+    paddingBottom: 0,
+    backgroundColor: 'transparent',
+    paddingLeft: 0,
+    transform: [{scaleX: 0.77}, {scaleY: 0.77}],
+    position: 'absolute',
+    color: "#cccccc"
   }
 });
 

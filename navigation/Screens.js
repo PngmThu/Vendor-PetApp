@@ -12,6 +12,9 @@ import { createBottomTabNavigator } from 'react-navigation-tabs';
 import Home from "../screens/Home";
 import ScheduleDetails from "../screens/ScheduleDetails";
 import Profile from "../screens/Profile";
+import Services from "../screens/Services";
+import ServiceInput from "../screens/ServiceInput";
+import ChangePassword from "../screens/ChangePassword";
 import Login from "../screens/Login";
 import Register from "../screens/Register";
 import ForgetPassword from "../screens/ForgetPassword"
@@ -29,9 +32,32 @@ const ProfileStack = createStackNavigator(
       navigationOptions:{
         header: null
       }
+    },
+    ChangePassword: {
+      screen: ChangePassword,
+      navigationOptions:{
+        header: null
+      }
     }
   },
 
+);
+
+const ServicesStack = createStackNavigator(
+  {
+    ServiceInput: {
+      screen: ServiceInput,
+      navigationOptions:{
+        header: null
+      }
+    },
+    Services: {
+      screen: Services,
+      navigationOptions:{
+        header: null
+      }
+    },
+  },
 );
 
 const HomeStack = createStackNavigator(
@@ -77,6 +103,7 @@ const LoginStack = createStackNavigator(
 );
 
 const TabNavigator = createBottomTabNavigator({
+  Services: ServicesStack,
   Profile: ProfileStack,
   Home: HomeStack,
 }, {
@@ -87,7 +114,8 @@ const TabNavigator = createBottomTabNavigator({
       tabBarIcon: ({ tintColor }) => {
         const name = {
           'Home': 'apps',
-          'Profile': 'person'
+          'Profile': 'person',
+          'Services': 'list'
         }[route]
         return <MaterialIcons name={name} color={tintColor} size={22} />
       },
@@ -108,13 +136,13 @@ const AppContainer = createAppContainer(createStackNavigator({
     navigationOptions: {
       header: null
     }
-  },  
+  }, 
   Account: {
     screen: LoginStack,  
     navigationOptions: {
       header: null,
     }
-  },
+  }, 
   }
 ));
 export default AppContainer;
