@@ -73,7 +73,6 @@ class ServiceInput extends React.Component {
       updateInfo = null
     }
 
-    if(this.s)
     return (
       <Block flex center style={styles.home}>
         <ImageBackground
