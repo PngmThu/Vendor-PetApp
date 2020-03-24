@@ -29,7 +29,7 @@ export default class NotificationAPI{
         return axios.get(url, options)
     }
 
-    getScheduleByVendorId(token,vendorId){
+    getUnavailableDateByVendorId(token,vendorId){
         const url = this.globals.serverHost + '/api/schedule/vendorId/'+vendorId;
 
         let options = {
