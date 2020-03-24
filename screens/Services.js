@@ -3,18 +3,13 @@ import {
   StyleSheet,
   ImageBackground,
   Dimensions,
-  StatusBar,
-  KeyboardAvoidingView,
-  Picker,
+  TouchableOpacity,
   View,
   ScrollView
 } from "react-native";
 import { Block, Text, theme } from "galio-framework";
-import { argonTheme } from "../constants";
-import { Button, Icon, Input } from "../components";
 import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
 import Notification from '../models/NotificationModel';
-import ToggleSwitch from 'toggle-switch-react-native';
 import Popup from '../components/Popup';
 const { width, height } = Dimensions.get("screen");
 
@@ -64,6 +59,9 @@ class Services extends React.Component {
     //console.log(this.props.navigation.state.params);
     this.logout = this.logout.bind(this);
     this.clickLogout = this.clickLogout.bind(this);
+    this.renderCard = this.renderCard.bind(this);
+    this.updateService = this.updateService.bind(this);
+    this.createService = this.createService.bind(this);
   }
 
   register(){
@@ -90,39 +88,48 @@ class Services extends React.Component {
     this.setState({popUpDialog: true})
   }
 
+  updateService(item){
+    this.props.navigation.navigate('ServiceInput', {createNew: false, data: item});
+  }
+
+  createService(){
+    this.props.navigation.navigate('ServiceInput', {createNew: true, data: null})
+  }
+
   renderCard(){
     var table = [];
     this.state.services.forEach((item, index) => {
         if(index % 2 == 0 && index + 1 < this.state.services.length){
             table.push(
                 <Block key={index} style={styles.container}>
-                    <View style={{...styles.cardService, marginRight: 10}}>
+                    <TouchableOpacity style={{...styles.cardService, marginRight: 10}} onPress={() => {this.updateService(item)}}>
                         <MaterialIcons name='pets' size={40} style={styles.petIcon}/>
                         <Text style={styles.priceTxt}>Price: {item.price} SGD</Text>
                         <View style={styles.cardFooter}>
                             <Text style={styles.itemTxt}>{item.name}</Text>
                         </View>
-                    </View>
-                    <View style={{...styles.cardService}}>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity style={{...styles.cardService}}  onPress={() => {this.updateService(item)}}>
                         <MaterialIcons name='pets' size={40} style={styles.petIcon}/>
                         <Text style={styles.priceTxt}>Price: {item.price} SGD</Text>
                         <View style={styles.cardFooter}>
                             <Text style={styles.itemTxt}>{item.name}</Text>
                         </View>
-                    </View>
+                    </TouchableOpacity>
                 </Block>
             )
         }
         else if(index % 2 == 0){
             table.push(
                 <Block key={index} style={styles.container}>
-                    <View style={{...styles.cardService}}>
+                    <TouchableOpacity style={{...styles.cardService}} onPress={() => {this.updateService(item)}}>
                         <MaterialIcons name='pets' size={40} style={styles.petIcon}/>
                         <Text style={styles.priceTxt}>Price: {item.price} SGD</Text>
                         <View style={styles.cardFooter}>
                             <Text style={styles.itemTxt}>{item.name}</Text>
                         </View>
-                    </View>
+                    </TouchableOpacity>
                 </Block>
             )
         }
@@ -142,10 +149,10 @@ class Services extends React.Component {
         
             <Popup visible={this.state.popUpDialog} choice={this.logout} question={"Do you want to log out?"}/> 
             <Block flex={0.2} middle >
-            <ImageBackground source={require("../assets/imgs/Schedule1.png")} resizeMode='contain' style={styles.headerImage}/>
-            <Text color="#ffffff" size={40} style={{ marginLeft: 15, fontFamily: 'ITCKRIST'}}>
-                Services
-            </Text>
+              <ImageBackground source={require("../assets/imgs/Schedule1.png")} resizeMode='contain' style={styles.headerImage}/>
+              <Text color="#ffffff" size={40} style={{ marginLeft: 15, fontFamily: 'ITCKRIST'}}>
+                  Services
+              </Text>
             </Block>
 
           <ScrollView style={{flex: 0.7, marginBottom: 60 }}>
@@ -154,9 +161,9 @@ class Services extends React.Component {
               </Block>
           </ScrollView>
           
-          <View style={styles.addBtn}>
+          <TouchableOpacity style={styles.addBtn} onPress={this.createService}>
             <MaterialCommunityIcons name="plus" size={50} style={styles.addIcon}></MaterialCommunityIcons>
-          </View>
+          </TouchableOpacity>
         </ImageBackground>
       </Block>
     );

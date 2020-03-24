@@ -16,6 +16,8 @@ import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
 import Notification from '../models/NotificationModel';
 import ToggleSwitch from 'toggle-switch-react-native';
 import Popup from '../components/Popup';
+import AuthAPI from '../api/AuthAPI';
+
 const { width, height } = Dimensions.get("screen");
 
 class Profile extends React.Component {
@@ -33,6 +35,7 @@ class Profile extends React.Component {
     //console.log(this.props.navigation.state.params);
     this.logout = this.logout.bind(this);
     this.clickLogout = this.clickLogout.bind(this);
+    this.authAPI = new AuthAPI();
   }
 
   register(){
@@ -48,11 +51,12 @@ class Profile extends React.Component {
     noti.resolveData();
   }
 
-  logout(bool){
-    if(bool){
-      console.log("Logged out!");
-    }
+  async logout(bool){
     this.setState({popUpDialog: false})
+    if(bool){
+      await this.authAPI.clearToken();
+      this.props.navigation.navigate('Account');
+    }
   }
 
   clickLogout(event){

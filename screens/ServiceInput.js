@@ -8,7 +8,8 @@ import {
   Picker,
   View,
   ScrollView,
-  TextInput
+  TextInput,
+  SafeAreaView
 } from "react-native";
 import { Block, Text, theme } from "galio-framework";
 import { argonTheme } from "../constants";
@@ -17,6 +18,7 @@ import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
 import Notification from '../models/NotificationModel';
 import ToggleSwitch from 'toggle-switch-react-native';
 import Popup from '../components/Popup';
+import Alert from '../components/Alert';
 const { width, height } = Dimensions.get("screen");
 
 class ServiceInput extends React.Component {
@@ -25,150 +27,186 @@ class ServiceInput extends React.Component {
     edit: false, 
     popUpDialog: false,
     name: "",
-    description: ""
+    description: "",
+    createNew: false,
+    obj: null,
+    alertDialog: false,
+    alertQuestion: ""
   }
 
   constructor(props){
     super(props);
-    //console.log(this.props.navigation.state.params);
-    this.logout = this.logout.bind(this);
-    this.clickLogout = this.clickLogout.bind(this);
+    this.getPropData = this.getPropData.bind(this);
+    this.clickSave = this.clickSave.bind(this);
+    this.confirm = this.confirm.bind(this);
+    this.validateInput = this.validateInput.bind(this);
+    this.dismissAlert = this.dismissAlert.bind(this);
   }
 
-  register(){
-    let noti = new Notification({
-      content: "123",
-      time: "14:00",
-      vendor: {
-        name: 123,
-        $key: 111
-      }
+  componentDidMount(){
+    this.focusListener = this.props.navigation.addListener('didFocus', () => {
+      this.getPropData()
     })
-
-    noti.resolveData();
   }
 
-  logout(bool){
-    if(bool){
-      console.log("Logged out!");
+  componentWillUnmount () {
+    this.focusListener.remove()
+  }
+
+  getPropData(){
+    var params = this.props.navigation.state.params;
+    if(params){
+      this.setState({createNew: params.createNew})
+      console.log(params.data);
+      if(params.data){
+        this.setState({price: params.data.price.toString(), name: params.data.name, 
+          description: params.data.description, obj: params.data})
+      }
+      else{
+        this.setState({price: "", name: "", description: "", obj: null})
+      }
     }
-    this.setState({popUpDialog: false})
+    else{
+      this.props.navigation.navigate("Services");
+    }
   }
 
-  clickLogout(event){
-    this.setState({popUpDialog: true})
+  clickSave(){
+    if(this.validateInput()){
+      this.setState({popUpDialog: true})
+    }
+  }
+
+  confirm(bool){
+    this.setState({popUpDialog: false, edit: false})
+  }
+
+  validateInput(){
+    if(isNaN(this.state.price) || this.state.price <= 0){
+      this.setState({alertDialog: true, alertQuestion: 'Invalid price input'})
+      return false;
+    }
+
+    if(this.state.name == ""){
+      this.setState({alertDialog: true, alertQuestion: 'Service name can not be empty'})
+      return false;
+    }
+    return true
+  }
+
+  dismissAlert(){
+    this.setState({alertDialog: false})
   }
 
   render() {
     const { navigation } = this.props;
-
-    if(this.state.edit){
-      var updateInfo = <Button style={styles.loginButton} onPress={() => {this.register()}}>
+    if(this.state.createNew || this.state.edit){
+      var actionBtn = <Button style={styles.loginButton} onPress={() => {this.clickSave()}}>
                           <Text bold size={16} color={argonTheme.COLORS.WHITE}>
-                            Update 
+                            Save 
                           </Text>
                         </Button>
     }
-    else{
-      updateInfo = null
+
+    if(!this.state.createNew){
+      var toggleBtn = <Block flex={0.1} row style={styles.action} >
+                        <View style={{justifyContent:'flex-end', flex: 1, flexDirection: 'row'}}>
+                          <ToggleSwitch
+                            isOn={this.state.edit}
+                            onColor={"#333333"}
+                            offColor={"#999999"}
+                            onToggle={(isOn) => {this.setState({edit: isOn})}}
+                          />
+                          <Text size={20} style={styles.editTxt}>Edit</Text>
+                        </View>
+                      </Block>
     }
-
     return (
-      <Block flex center style={styles.home}>
-        <ImageBackground
-          source={require("../assets/imgs/background2.gif")}
-          style={{ width, height, zIndex: 1 }}
-        >
-        
-        <Popup visible={this.state.popUpDialog} choice={this.logout} question={"Do you want to log out?"}/> 
-        <Block flex={0.6} middle >
-          <ImageBackground source={require("../assets/imgs/Schedule1.png")} resizeMode='contain' style={styles.headerImage}/>
-          <Text color="#ffffff" size={40} style={{ marginLeft: 15, fontFamily: 'ITCKRIST'}}>
-            Service Info
-          </Text>
+      
+      <SafeAreaView>
+        <Block flex center style={styles.home}>
+          <ImageBackground
+            source={require("../assets/imgs/background2.gif")}
+            style={{ width, height, zIndex: 1 }}
+          >
+
+          <Alert visible={this.state.alertDialog} dismiss={this.dismissAlert} question={this.state.alertQuestion}/> 
+          <Popup visible={this.state.popUpDialog} choice={this.confirm} 
+            question={this.state.createNew ? "Are you sure to create this service?" : "Are you sure to update this service?"}/> 
+
+          <Block flex={0.45} middle>
+            <ImageBackground source={require("../assets/imgs/Schedule1.png")} resizeMode='contain' style={styles.headerImage}/>
+              <MaterialIcons name='keyboard-backspace' size={40} style={styles.backBtn}
+                                        onPress={() => navigation.navigate("Services")}/>
+              <Text color="#ffffff" size={40} style={{ marginLeft: 15, fontFamily: 'ITCKRIST'}}>
+                Service Info
+              </Text>
+          </Block>
+
+            <ScrollView>
+              {toggleBtn}
+              <Block flex={0.55} center>
+                <KeyboardAvoidingView
+                  style={{ flex: 1 }}
+                  behavior="padding"
+                  enabled
+                >
+                  <Block width={width * 0.9} style={{marginTop: 20, marginBottom: 15 }}>
+                    <Input
+                      borderless
+                      placeholder="Service name"
+                      onChangeText={(name) => {this.setState({name})}}
+                      value={this.state.name}
+                      editable={this.state.edit || this.state.createNew}
+                      iconContent={
+                        <Icon
+                          size={16}
+                          color={'#ffffff'}
+                          name="hat-3"
+                          family="ArgonExtra"
+                          style={styles.inputIcons}
+                        />
+                      }
+                      style={{backgroundColor: '#333333'}}
+                    />
+                  </Block>
+                  <Block width={width * 0.9} style={{ marginBottom: 15 }}>
+                    <Input
+                      borderless 
+                      placeholder="Service price"
+                      editable={this.state.edit || this.state.createNew}
+                      onChangeText={(price) => {this.setState({price})}}
+                      value={this.state.price}
+                      iconContent={
+                        <MaterialCommunityIcons name="currency-usd" size={16} style={styles.inputIcons}></MaterialCommunityIcons>
+                      }
+                      style={{backgroundColor: '#333333'}}
+                    />
+                    <Text style={styles.currency}>SGD</Text>
+                  </Block>
+
+                  <Block width={width * 0.9} style={{ marginBottom: 15 }}>
+                    <TextInput
+                      placeholder="Description"
+                      editable={this.state.edit || this.state.createNew}
+                      onChangeText={(description) => {this.setState({description})}}
+                      value={this.state.description}
+                      numberOfLines={5}
+                      style={styles.descriptionBox}
+                    >
+                      </TextInput>
+                  </Block>
+
+                  <Block flex={0.1} middle style={{marginBottom: height * 0.1}}>
+                    {actionBtn}
+                  </Block>
+                </KeyboardAvoidingView>
+              </Block>
+            </ScrollView>
+          </ImageBackground>
         </Block>
+      </SafeAreaView>
 
-          <ScrollView>
-            <Block flex={0.1} row style={styles.action} >
-
-              <View style={{justifyContent:'flex-end', flex: 1, flexDirection: 'row'}}>
-                <ToggleSwitch
-                  isOn={this.state.edit}
-                  onColor={"#333333"}
-                  offColor={"#999999"}
-                  onToggle={(isOn) => {this.setState({edit: isOn})}}
-                />
-                <Text size={20} style={styles.editTxt}>Edit</Text>
-              </View>
-            </Block>
-
-            <Block flex={0.4} center>
-              <KeyboardAvoidingView
-                style={{ flex: 1 }}
-                behavior="padding"
-                enabled
-              >
-                <Block width={width * 0.9} style={{marginTop: 20, marginBottom: 15 }}>
-                  <Input
-                    borderless
-                    placeholder="Service name"
-                    onChangeText={(name) => {this.setState({name})}}
-                    value={this.state.name}
-                    editable={this.state.edit}
-                    iconContent={
-                      <Icon
-                        size={16}
-                        color={'#ffffff'}
-                        name="hat-3"
-                        family="ArgonExtra"
-                        style={styles.inputIcons}
-                      />
-                    }
-                    style={{backgroundColor: '#333333'}}
-                  />
-                </Block>
-                <Block width={width * 0.9} style={{ marginBottom: 15 }}>
-                  <Input
-                    borderless 
-                    placeholder="Service price"
-                    editable={this.state.edit}
-                    type={"numeric"}
-                    onChangeText={(email) => {this.setState({email})}}
-                    value={this.state.email}
-                    iconContent={
-                      <Icon
-                        size={16}
-                        color={'#ffffff'}
-                        name="ic_mail_24px"
-                        family="ArgonExtra"
-                        style={styles.inputIcons}
-                      />
-                    }
-                    style={{backgroundColor: '#333333'}}
-                  />
-                </Block>
-
-                <Block width={width * 0.9} style={{ marginBottom: 15 }}>
-                  <TextInput
-                    placeholder="Description"
-                    editable={this.state.edit}
-                    onChangeText={(description) => {this.setState({description})}}
-                    value={this.state.description}
-                    numberOfLines={5}
-                    style={styles.descriptionBox}
-                  >
-                    </TextInput>
-                </Block>
-
-                <Block flex={0.1} middle style={{marginBottom: height * 0.1}}>
-                  {updateInfo}
-
-                </Block>
-              </KeyboardAvoidingView>
-            </Block>
-          </ScrollView>
-        </ImageBackground>
-      </Block>
     );
   }
 }
@@ -202,6 +240,7 @@ const styles = StyleSheet.create({
   },
   inputIcons: {
     marginRight: 12,
+    color: 'white'
   },
   logoutIcon:{
     color: 'red',
@@ -248,6 +287,21 @@ const styles = StyleSheet.create({
       backgroundColor: "#333333",
       paddingHorizontal: 20,
       paddingVertical: 10
+  },
+  backBtn: {
+    position: 'absolute',
+    top: 40,
+    marginLeft: 22,
+    alignSelf: 'flex-start',
+    color: 'white'},
+  currency: {
+    position: 'absolute',
+    color: 'white',
+    fontSize: 14,
+    fontFamily: 'opensans',
+    alignSelf: 'flex-end',
+    right: 20,
+    top: 20
   }
 });
 

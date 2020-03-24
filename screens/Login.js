@@ -6,7 +6,8 @@ import {
   StatusBar,
   KeyboardAvoidingView,
   Image,
-  View
+  View,
+  Alert
 } from "react-native";
 import { Block, Checkbox, Text, theme } from "galio-framework";
 
@@ -17,18 +18,36 @@ import { Images, argonTheme } from "../constants";
 import { TouchableOpacity } from "react-native-gesture-handler";
 
 import { Avatar } from 'react-native-elements';
-//import { Icon } from 'react-native-elements';
-// import RadialGradient from 'react-native-radial-gradient';
-// import {
-//   RadialGradient,
-//   ImageBackgroundPlaceholder
-// } from 'react-native-image-filter-kit';
+import AuthAPI from '../api/AuthAPI';
 
 const { width, height } = Dimensions.get("screen");
 
 const headerImg = require("../assets/imgs/headerLogin.png");
 
 class Login extends React.Component {
+  state = {
+    email: "",
+    password: ""
+  }
+
+  constructor(props){
+    super(props);
+    this.authAPI = new AuthAPI();
+    this.login = this.login.bind(this);
+  }
+
+  login(){
+    this.authAPI.login(this.state.email, this.state.password, (res) => {
+      if(res == true){
+        this.props.navigation.navigate('Home')
+      }
+      else{
+        Alert.alert('Error', res,
+          [{text: 'Ok'}])
+      }
+    })
+  }
+
   render() {
     const { navigation } = this.props;
 
@@ -67,10 +86,12 @@ class Login extends React.Component {
                   <Input
                     borderless 
                     placeholder="Email"
+                    onChangeText={(email) => {this.setState({email})}}
+                    value={this.state.email}
                     iconContent={
                       <Icon
                         size={16}
-                        color={'#5E5454'}
+                        color={'white'}
                         name="ic_mail_24px"
                         family="ArgonExtra"
                         style={styles.inputIcons}
@@ -85,11 +106,13 @@ class Login extends React.Component {
                     viewPass
                     borderless
                     placeholder="Password"
+                    onChangeText={(password) => {this.setState({password})}}
+                    value={this.state.password}
                     iconContent={
                       <Icon
                         size={16}
                         //color={argonTheme.COLORS.ICON}
-                        color={'#5E5454'}
+                        color={'white'}
                         name="padlock-unlocked"
                         family="ArgonExtra"
                         style={styles.inputIcons}
@@ -102,38 +125,10 @@ class Login extends React.Component {
                       Forget Password?
                     </Text>
                   </TouchableOpacity>
-                  
-                  {/* <Block row style={styles.passwordCheck}>
-                    <Text size={12} color={argonTheme.COLORS.MUTED}>
-                      password strength:
-                    </Text>
-                    <Text bold size={12} color={argonTheme.COLORS.SUCCESS}>
-                      {" "}
-                      strong
-                    </Text>
-                  </Block>
-                </Block>
-                <Block row width={width * 0.75}>
-                  <Checkbox
-                    checkboxStyle={{
-                      borderWidth: 3
-                    }}
-                    color={argonTheme.COLORS.PRIMARY}
-                    label="I agree with the"
-                  />
-                  <Button
-                    style={{ width: 100 }}
-                    color="transparent"
-                    textStyle={{
-                      color: argonTheme.COLORS.PRIMARY,
-                      fontSize: 14
-                    }}
-                  >
-                    Privacy Policy
-                  </Button> */}
+
                 </Block> 
                 <Block flex middle>
-                  <Button color="primary" style={styles.loginButton} onPress={() => navigation.navigate('Home')}>
+                  <Button color="primary" style={styles.loginButton} onPress={this.login}>
                     <Text bold size={14} color={argonTheme.COLORS.WHITE}>
                       Login
                     </Text>
@@ -169,16 +164,6 @@ class Login extends React.Component {
                 </Block>
                 <Block row flex center style={{marginBottom: height * 0.05}}>
                   <Text size={14} color={argonTheme.COLORS.WHITE}>Don't have an account?</Text>
-                  {/* <Button
-                    style={{ width: 100 }}
-                    color="transparent"
-                    textStyle={{
-                      color: argonTheme.COLORS.PRIMARY,
-                      fontSize: 14
-                    }}
-                  >
-                    Register now
-                  </Button> */}
                   <TouchableOpacity onPress={() => navigation.navigate("Register")}>
                     <Text style={{color: argonTheme.COLORS.PRIMARY, fontSize: 14}}>
                       {"  "}Register now
@@ -189,119 +174,6 @@ class Login extends React.Component {
             </Block>
           </Block>
 
-          {/* <Block flex middle>
-            <Block style={styles.registerContainer}>
-              <Block flex={0.5} middle style={styles.socialConnect}>  
-                <Image source={Images.petsImg} />
-              </Block> 
-              <Block flex>
-                <Block flex={0.17}>
-                  <Text color="#8898AA" size={25} style={{ marginLeft: 15, marginTop: 15}}>
-                    Welcome to PetWorld
-                  </Text>
-                </Block>
-                <Block flex center>
-                  <KeyboardAvoidingView
-                    style={{ flex: 1 }}
-                    behavior="padding"
-                    enabled
-                  >
-                    <Block width={width * 0.8} style={{ marginBottom: 15 }}>
-                      <Input
-                        borderless
-                        placeholder="Name"
-                        iconContent={
-                          <Icon
-                            name='sc-telegram'
-                            type='evilicon'
-                            color='#517fa4'
-                          />
-                        }
-                      />
-            
-                    </Block>
-                    <Block width={width * 0.8} style={{ marginBottom: 15 }}>
-                      <Input
-                        borderless
-                        placeholder="Email"
-                        iconContent={
-                          <Icon
-                            name='sc-telegram'
-                            type='evilicon'
-                            color='#517fa4'
-                          />
-                        }   
-                      />
-                      
-                    </Block>
-                    <Block width={width * 0.8} style={{ marginBottom: 15 }}>
-                      <Input
-                        borderless
-                        placeholder="Email"
-                        iconContent={
-                          <Icon
-                            name='sc-telegram'
-                            type='evilicon'
-                            color='#517fa4'
-                          />
-                        }
-                      />
-                    </Block>
-                    <Block width={width * 0.8}>
-                      <Input
-                        password
-                        borderless
-                        placeholder="Password"
-                        iconContent={
-                          <Icon
-                            name='sc-telegram'
-                            type='evilicon'
-                            color='#517fa4'
-                          />
-                        }
-                      />
-                      
-                      <Block row style={styles.passwordCheck}>
-                        <Text size={12} color={argonTheme.COLORS.MUTED}>
-                          password strength:
-                        </Text>
-                        <Text bold size={12} color={argonTheme.COLORS.SUCCESS}>
-                          {" "}
-                          strong
-                        </Text>
-                      </Block>
-                    </Block>
-                    <Block row width={width * 0.75}>
-                      <Checkbox
-                        checkboxStyle={{
-                          borderWidth: 3
-                        }}
-                        color={argonTheme.COLORS.PRIMARY}
-                        label="I agree with the"
-                      />
-                      <Button
-                        style={{ width: 100 }}
-                        color="transparent"
-                        textStyle={{
-                          color: argonTheme.COLORS.PRIMARY,
-                          fontSize: 14
-                        }}
-                      >
-                        Privacy Policy
-                      </Button>
-                    </Block>
-                    <Block middle>
-                      <Button color="primary" style={styles.createButton}>
-                        <Text bold size={14} color={argonTheme.COLORS.WHITE}>
-                          CREATE ACCOUNT
-                        </Text>
-                      </Button>
-                    </Block>
-                  </KeyboardAvoidingView>
-                </Block>
-              </Block>
-            </Block>
-          </Block> */}
         </ImageBackground>
       </Block>  
     );

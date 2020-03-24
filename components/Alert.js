@@ -2,9 +2,21 @@ import Dialog, { DialogFooter, DialogButton, DialogContent, FadeAnimation } from
 import {Text, View, StyleSheet} from "react-native";
 import React from "react";
 
-class Popup extends React.Component{
+class Alert extends React.Component{
     constructor(props){
         super(props);
+    }
+
+    renderBtn(){
+        var table = []
+        table.push(
+            <DialogButton
+            text="Dismiss"
+            style = {styles.buttonDialog}
+            textStyle={styles.buttonTextDialog}
+            onPress={() => {this.props.dismiss()}}
+            />
+        )
     }
     render(){
         return(
@@ -20,16 +32,10 @@ class Popup extends React.Component{
                 footer={
                 <DialogFooter style={styles.footerDialog}>
                     <DialogButton
-                    text="CANCEL"
+                    text="Dismiss"
                     style = {styles.buttonDialog}
                     textStyle={styles.buttonTextDialog}
-                    onPress={() => {this.props.choice(false)}}
-                    />
-                    <DialogButton
-                    text="OK"
-                    style = {styles.buttonDialog}
-                    textStyle={styles.buttonTextDialog}
-                    onPress={() => {this.props.choice(true)}}
+                    onPress={() => {this.props.dismiss()}}
                     />
                 </DialogFooter>
                 }
@@ -51,7 +57,7 @@ const styles = StyleSheet.create({
         fontFamily: 'opensans',
         fontSize: 18,
         fontWeight: "300",
-        color: "#fefefe"
+        color: "red"
     },
     dialogContent: {
         justifyContent: 'center',
@@ -69,4 +75,4 @@ const styles = StyleSheet.create({
         justifyContent: "center",
     }
 })
-export default Popup;
+export default Alert;

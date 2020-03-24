@@ -1,9 +1,9 @@
 import React from 'react';
-import { StyleSheet, Dimensions, ScrollView, ImageBackground, View } from 'react-native';
+import { StyleSheet, Dimensions, ScrollView, ImageBackground, View, TouchableOpacity } from 'react-native';
 import { Block, theme, Text } from 'galio-framework';
 import Calendar from '../components/Calendar';
 import Popup from '../components/Popup';
-import { argonTheme } from "../constants";
+import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
 const { width, height } = Dimensions.get('screen');
 
 class Home extends React.Component {
@@ -27,6 +27,11 @@ class Home extends React.Component {
   }
 
   toggleDateStatus(marked, date){
+
+    setTimeout(() => {
+      this.scrollview_ref.scrollTo({ x: 0, y: height*2, animated: true });
+    }, 1)
+
     this.setState({clickedDate: date});
     if(!marked){
       this.setState({question: "Do you want to mark " + date + " as unavailable?"});
@@ -81,53 +86,56 @@ class Home extends React.Component {
           </Block>
 
           <Block flex={0.33} center style={{width: width, paddingBottom: 50}}>
-            <ScrollView style={{width: "100%"}}>
-              <View style={styles.agenda}>
+            <ScrollView scrollToOverflowEnabled={true} bounces={true} style={{width: "100%"}}   ref={ref => {this.scrollview_ref = ref;}}>
+              <View key={0} style={styles.agenda}>
                 <View style={styles.dayBackground}> 
                     <Text style={styles.day}>2</Text>
                 </View>
 
-                <View style={styles.leftDetail} onTouchStart={(event) => {this.scheduleDetail(event)}}>
-                  <Text style={styles.time}>09:00</Text>
+                <TouchableOpacity style={styles.leftDetail} onPress={() => {this.scheduleDetail("")}}>
+                  <Text style={styles.time}>09:00 </Text>
                   <Text style={styles.service}>Hair cutting service</Text>
-                </View>
+                  <MaterialIcons name="check-circle" size={22} style={{...styles.statusIcon, color: 'green'}}/>
+                </TouchableOpacity>
 
-                <View style={styles.leftDetail}>
+                <TouchableOpacity style={styles.leftDetail}>
                   <Text style={styles.time}>09:00</Text>
                   <Text style={styles.service}>Hair cutting service</Text>
-                </View>
+                  <MaterialCommunityIcons name="chevron-double-right" size={22} style={{...styles.statusIcon, color: '#FF9B70'}}/>
+                </TouchableOpacity>
               </View>
 
-              <View style={styles.agenda}>
+              <View key={1} style={styles.agenda}>
                 <View style={styles.dayBackground}> 
                     <Text style={styles.day}>2</Text>
                 </View>
 
-                <View style={styles.leftDetail}>
+                <TouchableOpacity style={styles.leftDetail}>
                   <Text style={styles.time}>09:00</Text>
                   <Text style={styles.service}>Hair cutting service</Text>
-                </View>
+                  <MaterialIcons name="cancel" size={22} style={{...styles.statusIcon, color: 'red'}}/>
+                </TouchableOpacity>
 
-                <View style={styles.leftDetail}>
+                <TouchableOpacity style={styles.leftDetail}>
                   <Text style={styles.time}>09:00</Text>
                   <Text style={styles.service}>Hair cutting service</Text>
-                </View>
+                </TouchableOpacity>
               </View>
 
-              <View style={styles.agenda}>
+              <View key={2} style={styles.agenda}>
                 <View style={styles.dayBackground}> 
                     <Text style={styles.day}>2</Text>
                 </View>
 
-                <View style={styles.leftDetail}>
+                <TouchableOpacity style={styles.leftDetail}>
                   <Text style={styles.time}>09:00</Text>
                   <Text style={styles.service}>Hair cutting service</Text>
-                </View>
+                </TouchableOpacity>
 
-                <View style={styles.leftDetail}>
+                <TouchableOpacity style={styles.leftDetail}>
                   <Text style={styles.time}>09:00</Text>
                   <Text style={styles.service}>Hair cutting service</Text>
-                </View>
+                </TouchableOpacity>
               </View>
             </ScrollView>
           </Block>
@@ -213,6 +221,13 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     textAlign: "center",
     color: "white"
+  },
+  statusIcon:{
+    fontWeight: "bold",
+    position: "absolute",
+    alignSelf: 'flex-end',
+    right: 20,
+    justifyContent: 'center'
   }
 });
 

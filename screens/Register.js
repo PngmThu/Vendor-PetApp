@@ -66,7 +66,7 @@ class Register extends React.Component {
                     iconContent={
                       <Icon
                         size={16}
-                        color={'#5E5454'}
+                        color={'white'}
                         name="hat-3"
                         family="ArgonExtra"
                         style={styles.inputIcons}
@@ -82,7 +82,7 @@ class Register extends React.Component {
                     iconContent={
                       <Icon
                         size={16}
-                        color={'#5E5454'}
+                        color={'white'}
                         name="ic_mail_24px"
                         family="ArgonExtra"
                         style={styles.inputIcons}
@@ -99,7 +99,7 @@ class Register extends React.Component {
                     iconContent={
                       <MaterialIcons
                         size={16}
-                        color={'#5E5454'}
+                        color={'white'}
                         name="phone"
                         family="ArgonExtra"
                         style={styles.inputIcons}
@@ -127,7 +127,7 @@ class Register extends React.Component {
                         height: 44,
                         paddingLeft: 15
                       }}>
-                      <MaterialIcons name="location-on" size={16} color="#5E5454" style={{marginRight: 10}} />
+                      <MaterialIcons name="location-on" size={16} color="white" style={{marginRight: 10}} />
                       <Picker
                         selectedValue={this.state.district}
                         style={{
@@ -162,7 +162,7 @@ class Register extends React.Component {
                     iconContent={
                       <Icon
                         size={16}
-                        color={'#5E5454'}
+                        color={'white'}
                         name="padlock-unlocked"
                         family="ArgonExtra"
                         style={styles.inputIcons}
@@ -180,7 +180,7 @@ class Register extends React.Component {
                     iconContent={
                       <Icon
                         size={16}
-                        color={'#5E5454'}
+                        color={'white'}
                         name="padlock-unlocked"
                         family="ArgonExtra"
                         style={styles.inputIcons}
@@ -192,7 +192,7 @@ class Register extends React.Component {
 
                 <Block flex middle style={{marginBottom: height * 0.1}}>
                   <Button color="primary" style={styles.loginButton} onPress={() => navigation.navigate("Register")}>
-                    <Text bold size={14} color={argonTheme.COLORS.WHITE}>
+                    <Text bold size={14} color={'white'}>
                       Register
                     </Text>
                   </Button>

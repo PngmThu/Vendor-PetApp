@@ -1,5 +1,5 @@
 import React from 'react';
-import { Image } from 'react-native';
+import { Image, NetInfo, Alert, Platform, BackHandler } from 'react-native';
 import { AppLoading } from 'expo';
 import { Asset } from 'expo-asset';
 import { Block, GalioProvider } from 'galio-framework';
@@ -34,10 +34,31 @@ function cacheImages(images) {
 export default class App extends React.Component {
   state = {
     isLoadingComplete: false,
+    internetConnection: false,
+    userToken: false
   }
-  
+
+  componentDidMount(){
+    this.CheckConnectivity();
+  }
+
+  CheckConnectivity(){
+    // For Android devices
+    if (Platform.OS === "android") {
+      NetInfo.isConnected.fetch().then(isConnected => {
+        if (isConnected) {
+          this.setState({internetConnection: true})
+        } else {
+          Alert.alert('Internet connection', 'Please connect to the Internet!', 
+          [{text: 'Ok', onPress: () => {BackHandler.exitApp()}}],
+          { cancelable: false });
+        }
+      });
+    }
+  };
+
   render() {
-    if(!this.state.isLoadingComplete) {
+    if(!this.state.isLoadingComplete || !this.state.internetConnection) {
       return (
         <AppLoading
           startAsync={this._loadResourcesAsync}
