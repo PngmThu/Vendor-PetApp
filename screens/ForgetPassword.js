@@ -3,7 +3,7 @@ import {
   StyleSheet,
   ImageBackground,
   Dimensions,
-  StatusBar,
+  Alert,
   KeyboardAvoidingView,
   Image,
   View
@@ -13,18 +13,38 @@ import { Block, Checkbox, Text, theme } from "galio-framework";
 import { Button, 
   Icon, 
   Input } from "../components";
-import { Images, argonTheme } from "../constants";
-import { TouchableOpacity } from "react-native-gesture-handler";
-
-import { Avatar } from 'react-native-elements';
-
+import AuthAPI from '../api/AuthAPI';
 import { MaterialIcons } from '@expo/vector-icons';
-
+import { argonTheme } from "../constants";
 const { width, height } = Dimensions.get("screen");
 
 const headerImg = require("../assets/imgs/headerLogin.png");
 
 class ResetPassword extends React.Component {
+
+  state = {
+    email: ''
+  }
+
+  constructor(props){
+    super(props);
+    this.authAPI = new AuthAPI();
+    this.forgetPwd = this.forgetPwd.bind(this);
+  }
+
+  forgetPwd(){
+    this.authAPI.forgetPassword(this.state.email, (res) => {
+      if(res == true){
+        Alert.alert('Email is sent successfully', 'Please check your mailbox to get your new password',
+        [{text: 'Ok'}])
+      }
+      else{
+        Alert.alert('Error', res,
+        [{text: 'Ok'}])
+      }
+    })
+  }
+
   render() {
     const { navigation } = this.props;
 
@@ -44,13 +64,18 @@ class ResetPassword extends React.Component {
                 {/* <Block flex middle> */}
                 <Block flex>
                     {/* <MaterialIcons name='keyboard-backspace' size={40} style={{left: -170, top: -65}} */}
-                    <MaterialIcons name='keyboard-backspace' size={40} style={{left: 15, top: 35}}
+                    <MaterialIcons name='keyboard-backspace' size={40} style={{left: 15, top: 35, color: 'white'}}
                                   onPress={() => navigation.goBack()}/>
                 </Block>
             </ImageBackground> 
           </Block>
 
           <Block flex>
+          <KeyboardAvoidingView
+                style={{ flex: 1 }}
+                behavior="padding"
+                keyboardVerticalOffset={0}
+              >
             <Block flex middle>
               <Image source={require("../assets/imgs/sendEmail.png")} resizeMode='contain' 
                        style={{width: width * 0.9, height: "100%"}}/>
@@ -65,15 +90,12 @@ class ResetPassword extends React.Component {
             </Block>
 
             <Block flex center>
-              <KeyboardAvoidingView
-                style={{ flex: 1 }}
-                behavior="padding"
-                enabled
-              >
                 <Block width={width * 0.9} style={{ marginTop: 40}}>
                   <Input
                     borderless 
                     placeholder="Email"
+                    onChangeText={(email) => {this.setState({email})}}
+                    value={this.state.email}
                     iconContent={
                       <Icon
                         size={16}
@@ -88,14 +110,14 @@ class ResetPassword extends React.Component {
                 </Block>
 
                 <Block flex middle style={{marginBottom: height * 0.08}}>
-                  <Button color="primary" style={styles.button} onPress={() => navigation.navigate("Register")}>
+                  <Button color="primary" style={styles.button} onPress={this.forgetPwd}>
                     <Text bold size={18} color={argonTheme.COLORS.WHITE}>
                       Send Email
                     </Text>
                   </Button>
                 </Block>
-              </KeyboardAvoidingView>
-            </Block>
+              </Block>
+            </KeyboardAvoidingView>
           </Block>
         </ImageBackground>
       </Block>  

@@ -15,7 +15,7 @@ import { Button,
   Icon, 
   Input } from "../components";
 import { Images, argonTheme } from "../constants";
-import { TouchableOpacity } from "react-native-gesture-handler";
+import { TouchableOpacity, ScrollView } from "react-native-gesture-handler";
 
 import { Avatar } from 'react-native-elements';
 import AuthAPI from '../api/AuthAPI';
@@ -76,93 +76,67 @@ class Login extends React.Component {
                 Welcome to PetWorld
               </Text>
             </Block>
-            <Block flex center>
+            
+            <Block flex={0.85} center>
               <KeyboardAvoidingView
-                style={{ flex: 1 }}
-                behavior="padding"
-                enabled
+                  behavior="padding" 
+                  keyboardVerticalOffset={100}
               >
-                <Block width={width * 0.9} style={{ marginBottom: 15 }}>
-                  <Input
-                    borderless 
-                    placeholder="Email"
-                    onChangeText={(email) => {this.setState({email})}}
-                    value={this.state.email}
-                    iconContent={
-                      <Icon
-                        size={16}
-                        color={'white'}
-                        name="ic_mail_24px"
-                        family="ArgonExtra"
-                        style={styles.inputIcons}
-                      />
-                    }
-                    style={{backgroundColor: '#333333'}}
-                  />
-                </Block>
-                <Block width={width * 0.9}>
-                  <Input
-                    password
-                    viewPass
-                    borderless
-                    placeholder="Password"
-                    onChangeText={(password) => {this.setState({password})}}
-                    value={this.state.password}
-                    iconContent={
-                      <Icon
-                        size={16}
-                        //color={argonTheme.COLORS.ICON}
-                        color={'white'}
-                        name="padlock-unlocked"
-                        family="ArgonExtra"
-                        style={styles.inputIcons}
-                      />
-                    }
-                    style={{backgroundColor: '#333333'}}
-                  /> 
-                  <TouchableOpacity onPress={() => navigation.navigate("ForgetPassword")}>
-                    <Text style={{color: argonTheme.COLORS.PRIMARY,fontSize: 14,textAlign: 'right'}}>
-                      Forget Password?
-                    </Text>
-                  </TouchableOpacity>
+                  <ScrollView>
+                  <Block width={width * 0.9} style={{ marginBottom: 15 }}>
+                    <Input
+                      borderless 
+                      placeholder="Email"
+                      onChangeText={(email) => {this.setState({email})}}
+                      value={this.state.email}
+                      iconContent={
+                        <Icon
+                          size={16}
+                          color={'white'}
+                          name="ic_mail_24px"
+                          family="ArgonExtra"
+                          style={styles.inputIcons}
+                        />
+                      }
+                      style={{backgroundColor: '#333333'}}
+                    />
+                  </Block>
+                  <Block width={width * 0.9}>
+                    <Input
+                      password
+                      viewPass
+                      borderless
+                      placeholder="Password"
+                      onChangeText={(password) => {this.setState({password})}}
+                      value={this.state.password}
+                      iconContent={
+                        <Icon
+                          size={16}
+                          //color={argonTheme.COLORS.ICON}
+                          color={'white'}
+                          name="padlock-unlocked"
+                          family="ArgonExtra"
+                          style={styles.inputIcons}
+                        />
+                      }
+                      style={{backgroundColor: '#333333'}}
+                    /> 
+                    <TouchableOpacity onPress={() => navigation.navigate("ForgetPassword")}>
+                      <Text style={{color: argonTheme.COLORS.PRIMARY,fontSize: 14,textAlign: 'right'}}>
+                        Forget Password?
+                      </Text>
+                    </TouchableOpacity>
 
-                </Block> 
-                <Block flex middle>
-                  <Button color="primary" style={styles.loginButton} onPress={this.login}>
-                    <Text bold size={14} color={argonTheme.COLORS.WHITE}>
-                      Login
-                    </Text>
-                  </Button>
-                </Block>
-                <Text flex size={14} color={'#676767'} style={{textAlign: 'center', marginTop: 20}}>
-                  OR
-                </Text>
-                {/* <Block flex style={{flexDirection: "row", justifyContent: "center", marginTop: -110}}> */}
-                <Block flex row style={{justifyContent: "center"}}>
-                  <Block middle style={{marginRight: 20}}>
-                    <TouchableOpacity>
-                      {/* <Image source={require("../assets/imgs/google.png")} 
-                            //resizeMode='contain'
-                            style={{height: 50, width: 50, flex: 1, resizeMode: 'contain'}}
-                      /> */}
-                      <Avatar
-                        rounded
-                        size="medium"
-                        source={require("../assets/imgs/google.png")}
-                      />
-                    </TouchableOpacity>
+                  </Block> 
+                  <Block flex middle>
+                    <Button color="primary" style={styles.loginButton} onPress={this.login}>
+                      <Text bold size={14} color={argonTheme.COLORS.WHITE}>
+                        Login
+                      </Text>
+                    </Button>
                   </Block>
-                  <Block middle>  
-                    <TouchableOpacity flex>
-                      <Avatar
-                        rounded
-                        size="medium"
-                        source={require("../assets/imgs/facebook.png")}
-                      />
-                    </TouchableOpacity>
-                  </Block>
-                </Block>
-                <Block row flex center style={{marginBottom: height * 0.05}}>
+
+                <Block row flex center style={{marginBottom: height * 0.05, marginTop: 30}}>
                   <Text size={14} color={argonTheme.COLORS.WHITE}>Don't have an account?</Text>
                   <TouchableOpacity onPress={() => navigation.navigate("Register")}>
                     <Text style={{color: argonTheme.COLORS.PRIMARY, fontSize: 14}}>
@@ -170,6 +144,7 @@ class Login extends React.Component {
                     </Text>
                   </TouchableOpacity>
                 </Block>
+                </ScrollView>
               </KeyboardAvoidingView>
             </Block>
           </Block>

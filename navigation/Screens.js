@@ -79,7 +79,7 @@ const HomeStack = createStackNavigator(
 
 );
 
-const LoginStack = createSwitchNavigator(
+const LoginStack = createStackNavigator(
   {
     Login: {
       screen: Login,

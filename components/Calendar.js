@@ -10,11 +10,31 @@ class CalendarComponent extends React.Component {
 
     constructor(props){
         super(props);
-        this.markDate = this.markDate.bind(this);
+        this.setDate = this.setDate.bind(this);
+        this.processDate = this.processDate.bind(this);
+        this.todayDate = this.todayDate.bind(this);
+        this.updateDate = this.updateDate.bind(this);
     }
 
     componentDidMount(){
-        this.markDate();
+    }
+
+    processDate(){
+        var bookedDate = this.props.bookedDate;
+        var unavailableDate = this.props.unavailableDate;
+        var markedDate = {}
+        console.log(bookedDate);
+        for(var i = 0; i < bookedDate.length; i ++){
+            markedDate[bookedDate[i]] = {selected: true, customStyles: bookedDay};
+        }
+
+        for(var i = 0; i < unavailableDate.length; i ++ ){
+            markedDate[unavailableDate[i]] = {selected: true, customStyles: unavailable};
+        }
+
+        markedDate[this.todayDate()] = {selected: true, customStyles: today}
+
+        this.setState({markedDate})
     }
 
     updateDate(clickedDate){
@@ -37,7 +57,7 @@ class CalendarComponent extends React.Component {
         }
     }
 
-    markDate(){
+    todayDate(){
         let currentDate = new Date();
         let year = currentDate.getFullYear()
         let month = currentDate.getMonth() + 1;
@@ -45,11 +65,7 @@ class CalendarComponent extends React.Component {
             month = "0" + month;
         }
         let day = currentDate.getDate();
-        let markedDate = {};
-        markedDate[year + "-" + month + "-" + day] = {selected: true, customStyles: today};
-        markedDate['2020-03-01'] = {selected: true, customStyles: bookedDay};
-        markedDate['2020-03-02'] = {selected: true, customStyles: unavailable};
-        this.setState({markedDate: markedDate});
+        return year + "-" + month + "-" + day;
     }
 
     render() {

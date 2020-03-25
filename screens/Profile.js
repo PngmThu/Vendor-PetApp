@@ -132,7 +132,7 @@ class Profile extends React.Component {
                         style={styles.inputIcons}
                       />
                     }
-                    style={{backgroundColor: '#333333'}}
+                    style={this.state.edit ? {backgroundColor: '#333333'}: {backgroundColor: '#1f1f1f'}}
                   />
                 </Block>
                 <Block width={width * 0.9} style={{ marginBottom: 15 }}>
@@ -151,7 +151,7 @@ class Profile extends React.Component {
                         style={styles.inputIcons}
                       />
                     }
-                    style={{backgroundColor: '#333333'}}
+                    style={this.state.edit ? {backgroundColor: '#333333'}: {backgroundColor: '#1f1f1f'}}
                   />
                 </Block>
 
@@ -171,7 +171,7 @@ class Profile extends React.Component {
                         style={styles.inputIcons}
                       />
                     }
-                    style={{backgroundColor: '#333333'}}
+                    style={this.state.edit ? {backgroundColor: '#333333'}: {backgroundColor: '#1f1f1f'}}
                   />
                 </Block>
 
@@ -199,9 +199,7 @@ class Profile extends React.Component {
                         selectedValue={this.state.address}
                         enabled={this.state.edit}
                         style={styles.picker}
-                        itemStyle={{
-                          backgroundColor:"#000000"
-                        }}
+                        itemStyle={this.state.edit ? {backgroundColor: '#333333'}: {backgroundColor: '#1f1f1f'}}
                       >
                         <Picker.Item label="Address" value="" />
                         <Picker.Item label="Java" value="java" />

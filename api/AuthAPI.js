@@ -30,7 +30,7 @@ export default class AuthAPI{
         })
     }
 
-    forgetPassword(email){
+    forgetPassword(email, callback){
         const url = this.globals.serverHost + '/api/auth/password/vendor';
 
         let options = {

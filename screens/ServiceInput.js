@@ -167,7 +167,7 @@ class ServiceInput extends React.Component {
                           style={styles.inputIcons}
                         />
                       }
-                      style={{backgroundColor: '#333333'}}
+                      style={this.state.edit ? {backgroundColor: '#333333'}: {backgroundColor: '#1f1f1f'}}
                     />
                   </Block>
                   <Block width={width * 0.9} style={{ marginBottom: 15 }}>
@@ -180,7 +180,7 @@ class ServiceInput extends React.Component {
                       iconContent={
                         <MaterialCommunityIcons name="currency-usd" size={16} style={styles.inputIcons}></MaterialCommunityIcons>
                       }
-                      style={{backgroundColor: '#333333'}}
+                      style={this.state.edit ? {backgroundColor: '#333333'}: {backgroundColor: '#1f1f1f'}}
                     />
                     <Text style={styles.currency}>SGD</Text>
                   </Block>
@@ -192,7 +192,7 @@ class ServiceInput extends React.Component {
                       onChangeText={(description) => {this.setState({description})}}
                       value={this.state.description}
                       numberOfLines={5}
-                      style={styles.descriptionBox}
+                      style={this.state.edit ? {...styles.descriptionBox, backgroundColor: '#333333'} : {...styles.descriptionBox, backgroundColor: '#1f1f1f'}}
                     >
                       </TextInput>
                   </Block>
@@ -284,7 +284,6 @@ const styles = StyleSheet.create({
       color: 'white',
       textAlignVertical: 'top',
       borderRadius: 10,
-      backgroundColor: "#333333",
       paddingHorizontal: 20,
       paddingVertical: 10
   },
