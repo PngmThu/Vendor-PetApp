@@ -15,7 +15,6 @@ export class Booking extends BaseModel {
         vendor: {type: 'object'},
         status: { type: 'string'},
         customer: {type: 'object'},
-        $key: {type: 'string'},
 	};
 
     resolveData(){

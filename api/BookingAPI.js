@@ -60,7 +60,7 @@ export default class BookingAPI{
     }
 
     deleteBookingById(token, bookingId){
-        const url = this.globals.serverHost + '/api/'+ bookingId;
+        const url = this.globals.serverHost + '/api/booking/'+ bookingId;
 
         let options = {
             headers: {token: token, 'Access-Control-Allow-Origin':'*'}
@@ -70,7 +70,7 @@ export default class BookingAPI{
     }
 
     updateBookingById(token, bookingId, bookingStatus){
-        const url = this.globals.serverHost + '/api/'+ bookingId;
+        const url = this.globals.serverHost + '/api/booking/'+ bookingId;
 
         let options = {
             headers: {token: token, 'Access-Control-Allow-Origin':'*'}
