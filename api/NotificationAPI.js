@@ -29,31 +29,9 @@ export default class NotificationAPI{
         return axios.get(url, options)
     }
 
-    getNotificationByCustomerId(token,customerId){
-
-        const url = this.globals.serverHost + '/api/notification/customer/'+customerId;
-
-        let options = {
-            headers: {token: token, 'Access-Control-Allow-Origin':'*'}
-        };
-
-        return axios.get(url, options)
-    }
-
     getNotificationByVendorId(token,vendorId){
 
         const url = this.globals.serverHost + '/api/notification/vendor/'+vendorId;
-
-        let options = {
-            headers: {token: token, 'Access-Control-Allow-Origin':'*'}
-        };
-
-        return axios.get(url, options)
-    }
-
-    getNotificationByPetId(token,petId){
-
-        const url = this.globals.serverHost + '/api/notification/pet/'+petId;
 
         let options = {
             headers: {token: token, 'Access-Control-Allow-Origin':'*'}
