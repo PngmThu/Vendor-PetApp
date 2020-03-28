@@ -1,49 +1,40 @@
 import axios from 'axios';
 import Globals from '../globals/globals';
+import AuthAPI from './AuthAPI';
 
 export default class NotificationAPI{
     constructor() {
         this.globals = new Globals();
     }
 
-    postUnavailableDate(token,vendorId,date){
+    async createUnavailableDate(vendor,date){
 
         const url = this.globals.serverHost + '/api/schedule/add';
 
         let options = {
-            headers: {token: token, 'Access-Control-Allow-Origin':'*'}
+            headers: {token: AuthAPI.retrieveToken(), 'Access-Control-Allow-Origin':'*'}
         };
 
-        let body = {date: date,vendorId: vendorId};
+        let body = {date: date,vendorId: vendor._id};
         return axios.post(url, body, options)
     }
 
-    getUnavailableDateById(token,id){
 
-        const url = this.globals.serverHost + '/api/schedule/'+id;
-
-        let options = {
-            headers: {token: token, 'Access-Control-Allow-Origin':'*'}
-        };
-
-        return axios.get(url, options)
-    }
-
-    getUnavailableDateByVendorId(token,vendorId){
-        const url = this.globals.serverHost + '/api/schedule/vendorId/'+vendorId;
+    async getUnavailableDateByVendorId(vendor){
+        const url = this.globals.serverHost + '/api/schedule/vendorId/'+vendor._id;
 
         let options = {
-            headers: {token: token, 'Access-Control-Allow-Origin':'*'}
+            headers: {token: AuthAPI.retrieveToken(), 'Access-Control-Allow-Origin':'*'}
         }
 
         return axios.get(url,options);
     }
 
-    deleteUnavailableDateById(token, id){
+    async deleteUnavailableDateById(id){
         const url = this.globals.serverHost + '/api/schedule/'+id;
 
         let options = {
-            headers: {token: token, 'Access-Control-Allow-Origin':'*'}
+            headers: {token: AuthAPI.retrevetoken(), 'Access-Control-Allow-Origin':'*'}
         }
 
         return axios.delete(url,options);
