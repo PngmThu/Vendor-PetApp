@@ -7,6 +7,7 @@ export default class Notification extends BaseModel {
     }
     
 	static schema = {
+        _id: {type: 'string'},
         content: {type: 'string'},
         time: {type: 'Date'},
         customerId: {type: 'string'},

@@ -7,6 +7,7 @@ export class Booking extends BaseModel {
     }
     
 	static schema = {
+        _id: {type:'string'},
         name: {type: 'string'},
         dateOfBirth: { type : 'object'},
         weight: {type: 'number'},

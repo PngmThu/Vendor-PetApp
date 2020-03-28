@@ -7,6 +7,7 @@ export class Schedule extends BaseModel{
     }
 
     static schema = {
+        _id: {type:'string'},
         date: {type: 'object'},
         vendorId: {type: 'string'}
     }
