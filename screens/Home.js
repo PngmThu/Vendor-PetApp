@@ -1,9 +1,9 @@
 import React from 'react';
-import { StyleSheet, Dimensions, ScrollView, ImageBackground, View } from 'react-native';
+import { StyleSheet, Dimensions, ScrollView, ImageBackground, View, TouchableOpacity } from 'react-native';
 import { Block, theme, Text } from 'galio-framework';
 import Calendar from '../components/Calendar';
 import Popup from '../components/Popup';
-import { argonTheme } from "../constants";
+import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
 const { width, height } = Dimensions.get('screen');
 
 class Home extends React.Component {
@@ -14,12 +14,19 @@ class Home extends React.Component {
     this.toggleDateStatus = this.toggleDateStatus.bind(this);
     this.scheduleDetail = this.scheduleDetail.bind(this);
     this.dateStatusChoice = this.dateStatusChoice.bind(this);
+    this.scheduleByMonth = this.scheduleByMonth.bind(this);
   }
 
   state = {
     popUpDialog: false,
     question: null,
-    clickedDate: null
+    clickedDate: null,
+    unavailableDate: [],
+    bookedDate: []
+  }
+
+  componentDidMount(){
+    this.scheduleByMonth('');
   }
 
   scheduleDetail(event){
@@ -27,6 +34,11 @@ class Home extends React.Component {
   }
 
   toggleDateStatus(marked, date){
+
+    setTimeout(() => {
+      this.scrollview_ref.scrollTo({ x: 0, y: height*2, animated: true });
+    }, 1)
+
     this.setState({clickedDate: date});
     if(!marked){
       this.setState({question: "Do you want to mark " + date + " as unavailable?"});
@@ -43,6 +55,52 @@ class Home extends React.Component {
       this.calendarRef.current.updateDate(this.state.clickedDate);
     }
     this.setState({popUpDialog: false});
+  }
+
+  scheduleByMonth(month){
+    this.setState({unavailableDate: ['2020-03-01', '2020-03-02'], bookedDate: ['2020-03-03', '2020-03-05'],
+                  }, () => {
+                    this.calendarRef.current.processDate();
+                  })
+  }
+
+  renderTimeSchedule(index){
+    let table = [];
+    for(var i = index; i < this.state.bookedDate.length; i++){
+      table.push(
+        <TouchableOpacity key={i} style={styles.leftDetail} onPress={() => {this.scheduleDetail(i)}}>
+          <Text style={styles.time}>09:00</Text>
+          <Text style={styles.service}>Hair cutting service</Text>
+          <MaterialIcons name="cancel" size={22} style={{...styles.statusIcon, color: 'red'}}/>
+        </TouchableOpacity>
+      )
+    }
+    return table
+  }
+
+  renderDaySchedule(date){
+    let table = [];
+    let lastDate = "";
+    let counter = 0;
+    for(var i = 0; i < this.state.bookedDate.length; i++){
+        if(this.state.bookedDate[i]){
+          table.push(
+            <View key={counter} style={styles.agenda}>
+              <View style={styles.dayBackground}> 
+                  <Text style={styles.day}>2</Text>
+              </View>
+
+              <View style={styles.month}>
+                <Text style={styles.monthTxt}>Mar</Text>
+              </View>
+
+              {this.renderTimeSchedule(i)}
+            </View>
+          )
+        }
+        counter += 1;
+    }
+    return table
   }
 
   render() {
@@ -77,64 +135,25 @@ class Home extends React.Component {
           </Block>
 
           <Block flex={0.47} center style={styles.calendar}>
-            <Calendar ref={this.calendarRef} markDate={this.state.clickedDate} toggleDateStatus={this.toggleDateStatus}/>
+            <Calendar ref={this.calendarRef} unavailableDate={this.state.unavailableDate} 
+                      bookedDate={this.state.bookedDate} markDate={this.state.clickedDate} toggleDateStatus={this.toggleDateStatus}/>
           </Block>
 
           <Block flex={0.33} center style={{width: width, paddingBottom: 50}}>
-            <ScrollView style={{width: "100%"}}>
-              <View style={styles.agenda}>
-                <View style={styles.dayBackground}> 
-                    <Text style={styles.day}>2</Text>
-                </View>
-
-                <View style={styles.leftDetail} onTouchStart={(event) => {this.scheduleDetail(event)}}>
-                  <Text style={styles.time}>09:00</Text>
-                  <Text style={styles.service}>Hair cutting service</Text>
-                </View>
-
-                <View style={styles.leftDetail}>
-                  <Text style={styles.time}>09:00</Text>
-                  <Text style={styles.service}>Hair cutting service</Text>
-                </View>
-              </View>
-
-              <View style={styles.agenda}>
-                <View style={styles.dayBackground}> 
-                    <Text style={styles.day}>2</Text>
-                </View>
-
-                <View style={styles.leftDetail}>
-                  <Text style={styles.time}>09:00</Text>
-                  <Text style={styles.service}>Hair cutting service</Text>
-                </View>
-
-                <View style={styles.leftDetail}>
-                  <Text style={styles.time}>09:00</Text>
-                  <Text style={styles.service}>Hair cutting service</Text>
-                </View>
-              </View>
-
-              <View style={styles.agenda}>
-                <View style={styles.dayBackground}> 
-                    <Text style={styles.day}>2</Text>
-                </View>
-
-                <View style={styles.leftDetail}>
-                  <Text style={styles.time}>09:00</Text>
-                  <Text style={styles.service}>Hair cutting service</Text>
-                </View>
-
-                <View style={styles.leftDetail}>
-                  <Text style={styles.time}>09:00</Text>
-                  <Text style={styles.service}>Hair cutting service</Text>
-                </View>
-              </View>
+            <ScrollView scrollToOverflowEnabled={true} bounces={true} style={{width: "100%"}}   ref={ref => {this.scrollview_ref = ref;}}>
+              {this.renderDaySchedule()}
             </ScrollView>
           </Block>
         </ImageBackground>
       </Block>
     );
   }
+}
+
+const iconStatus = {
+  'cancelled': 'cancel',
+  'booked': 'chevron-double-right',
+  'completed': 'check-circle'
 }
 
 const styles = StyleSheet.create({
@@ -177,7 +196,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     alignSelf: 'flex-end',
     backgroundColor: 'rgba(45, 45, 45, 0.8)',
-    height: 60,
+    height: 80,
     paddingLeft: 20,
     paddingRight: 20,
     justifyContent: "center",
@@ -185,13 +204,13 @@ const styles = StyleSheet.create({
   },
   service: {
     fontFamily: "opensans",
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: "300",
     color: "white"
   },
   time: {
     fontFamily: "opensans",
-    fontSize: 17,
+    fontSize: 19,
     fontWeight: "600",
     color: "white"
   },
@@ -213,6 +232,26 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     textAlign: "center",
     color: "white"
+  },
+  statusIcon:{
+    fontWeight: "bold",
+    position: "absolute",
+    alignSelf: 'flex-end',
+    right: 20,
+    justifyContent: 'center'
+  },
+  month:{
+    position: 'absolute',
+    marginLeft: 17,
+    alignSelf: 'flex-start',
+    marginTop: 60
+  },
+  monthTxt: {
+    color: 'white',
+    fontFamily: 'opensans',
+    fontWeight: '600',
+    fontSize: 20,
+    textAlign: 'center'
   }
 });
 

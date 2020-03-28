@@ -6,16 +6,38 @@ export default class NotificationAPI{
         this.globals = new Globals();
     }
 
-    getNotificationList(){
+    postNotification(token, content, time, customerId, vendorId){
 
-        const url = this.globals.serverHost + '/api/notification';
-        let token = "To be added later";
+        const url = this.globals.serverHost + '/api/notification/add';
 
         let options = {
             headers: {token: token, 'Access-Control-Allow-Origin':'*'}
         };
 
-        let body = {};
-        return axios.get(url, body, options)
+        let body = {content: content, time: time, customerId: customerId, vendorId: vendorId};
+        return axios.post(url, body, options)
     }
+
+    getNotificationById(token,id){
+
+        const url = this.globals.serverHost + '/api/notification/'+id;
+
+        let options = {
+            headers: {token: token, 'Access-Control-Allow-Origin':'*'}
+        };
+
+        return axios.get(url, options)
+    }
+
+    getNotificationByVendorId(token,vendorId){
+
+        const url = this.globals.serverHost + '/api/notification/vendor/'+vendorId;
+
+        let options = {
+            headers: {token: token, 'Access-Control-Allow-Origin':'*'}
+        };
+
+        return axios.get(url, options)
+    }
+
 }

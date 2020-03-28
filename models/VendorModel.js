@@ -7,6 +7,7 @@ export class Vendor extends BaseModel {
     }
     
 	static schema = {
+        _id: {type:'string'},
         email: {type: 'string'},
         createdAt: {type: 'string'},
         updatedAt: {type: 'string'},

@@ -1,3 +1,3 @@
 export default class Globals {
-    serverHost = 'http://localhost:4000';
+    serverHost = 'http://192.168.0.102:4000';
 }

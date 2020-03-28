@@ -3,14 +3,14 @@ import {
   StyleSheet,
   ImageBackground,
   Dimensions,
-  StatusBar,
+  ScrollView,
   KeyboardAvoidingView,
   Picker,
   View,
   Text
 } from "react-native";
 import { Block, Checkbox, theme } from "galio-framework";
-
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import { Button, 
   Icon, 
   Input, Select } from "../components";
@@ -32,172 +32,170 @@ class Register extends React.Component {
 
     return (
       <Block flex middle >
-        {/* <StatusBar hidden /> */}
         
         <ImageBackground
           source={require("../assets/imgs/background2.gif")}
           style={{ width, height, zIndex: 1 }}
         >
-          <Block flex={0.4} middle>
+          <Block flex={0.3} middle>
             <ImageBackground source={require("../assets/imgs/headerRegister.png")} resizeMode='contain' style={styles.headerImage}>
                 <Block flex middle>
-                    <MaterialIcons name='keyboard-backspace' size={40} style={{left: -170, top: -65}}
-                                  onPress={() => navigation.goBack()}/>
+                    <MaterialIcons name='keyboard-backspace' size={40} style={{left: -170, top: -35, color:'white'}}
+                                  onPress={() => navigation.navigate('Login')}/>
                 </Block>
             </ImageBackground> 
           </Block>
 
-          <Block flex>
-            <Block flex={0.15}>
-              <Text color="#E1E1E1" size={32} style={{ marginLeft: 15, marginTop: 20, fontWeight: 'bold'}}>
+          <Block flex={0.7}>
+            <Block flex={0.1}>
+              <Text style={{ marginLeft: 15, fontSize: 32, fontWeight: 'bold', color:'white'}}>
                 Create an account
               </Text>
             </Block>
-            <Block flex center>
-              <KeyboardAvoidingView
-                style={{ flex: 1 }}
-                behavior="padding"
-                enabled
-              >
-                <Block width={width * 0.9} style={{marginTop: 20, marginBottom: 15 }}>
-                  <Input
-                    borderless
-                    placeholder="Your name"
-                    iconContent={
-                      <Icon
-                        size={16}
-                        color={'#5E5454'}
-                        name="hat-3"
-                        family="ArgonExtra"
-                        style={styles.inputIcons}
-                      />
-                    }
-                    style={{backgroundColor: '#333333'}}
-                  />
-                </Block>
-                <Block width={width * 0.9} style={{ marginBottom: 15 }}>
-                  <Input
-                    borderless 
-                    placeholder="Email"
-                    iconContent={
-                      <Icon
-                        size={16}
-                        color={'#5E5454'}
-                        name="ic_mail_24px"
-                        family="ArgonExtra"
-                        style={styles.inputIcons}
-                      />
-                    }
-                    style={{backgroundColor: '#333333'}}
-                  />
-                </Block>
 
-                <Block width={width * 0.9} style={{ marginBottom: 15 }}>
-                  <Input
-                    borderless 
-                    placeholder="Phone number"
-                    iconContent={
-                      <MaterialIcons
-                        size={16}
-                        color={'#5E5454'}
-                        name="phone"
-                        family="ArgonExtra"
-                        style={styles.inputIcons}
+            <Block flex={0.9} center style={{paddingBottom: 50}}>
+                <KeyboardAvoidingView behavior="padding" keyboardVerticalOffset={300}>
+                  <ScrollView>
+                    <Block width={width * 0.9} style={{marginTop: 20, marginBottom: 15 }}>
+                      <Input
+                        borderless
+                        placeholder="Your name"
+                        iconContent={
+                          <Icon
+                            size={16}
+                            color={'white'}
+                            name="hat-3"
+                            family="ArgonExtra"
+                            style={styles.inputIcons}
+                          />
+                        }
+                        style={{backgroundColor: '#333333'}}
                       />
-                    }
-                    style={{backgroundColor: '#333333'}}
-                  />
-                </Block>
+                    </Block>
+                    <Block width={width * 0.9} style={{ marginBottom: 15 }}>
+                      <Input
+                        borderless 
+                        placeholder="Email"
+                        iconContent={
+                          <Icon
+                            size={16}
+                            color={'white'}
+                            name="ic_mail_24px"
+                            family="ArgonExtra"
+                            style={styles.inputIcons}
+                          />
+                        }
+                        style={{backgroundColor: '#333333'}}
+                      />
+                    </Block>
 
-                <Block width={width * 0.9} style={{ marginBottom: 15 }}>
-                  <View
-                    style={{
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                      backgroundColor: '#333333',
-                      borderRadius: 9
-                    }}>
-                    <View
-                      style={{
-                        width: '100%',
-                        flexDirection: 'row',
-                        flex: 1,
-                        position: 'relative',
-                        alignItems: 'center',
-                        height: 44,
-                        paddingLeft: 15
-                      }}>
-                      <MaterialIcons name="location-on" size={16} color="#5E5454" style={{marginRight: 10}} />
-                      <Picker
-                        selectedValue={this.state.district}
+                    <Block width={width * 0.9} style={{ marginBottom: 15 }}>
+                      <Input
+                        borderless 
+                        placeholder="Phone number"
+                        iconContent={
+                          <MaterialIcons
+                            size={16}
+                            color={'white'}
+                            name="phone"
+                            family="ArgonExtra"
+                            style={styles.inputIcons}
+                          />
+                        }
+                        style={{backgroundColor: '#333333'}}
+                      />
+                    </Block>
+
+                    <Block width={width * 0.9} style={{ marginBottom: 15 }}>
+                      <View
                         style={{
-                          width: '100%',
-                          paddingBottom: 0,
-                          backgroundColor: 'transparent',
-                          paddingLeft: 0,
-                          transform: [{scaleX: 0.77}, {scaleY: 0.77}],
-                          position: 'absolute',
-                          color: "#cccccc"
-                        }}
-                        itemStyle={{
-                          backgroundColor:"#000000"
-                        }}
-                        onValueChange={(itemValue, itemIndex) =>
-                          this.setState({district: itemValue})
-                        }>
-                        <Picker.Item label="Address" value="" />
-                        <Picker.Item label="Java" value="java" />
-                        <Picker.Item label="JavaScript" value="js" />
-                      </Picker>
-                    </View>
-                  </View>
-                </Block>
+                          flexDirection: 'row',
+                          alignItems: 'center',
+                          backgroundColor: '#333333',
+                          borderRadius: 9
+                        }}>
+                        <View
+                          style={{
+                            width: '100%',
+                            flexDirection: 'row',
+                            flex: 1,
+                            position: 'relative',
+                            alignItems: 'center',
+                            height: 44,
+                            paddingLeft: 15
+                          }}>
+                          <MaterialIcons name="location-on" size={16} color="white" style={{marginRight: 10}} />
+                          <Picker
+                            selectedValue={this.state.district}
+                            style={{
+                              width: '100%',
+                              paddingBottom: 0,
+                              backgroundColor: 'transparent',
+                              paddingLeft: 0,
+                              transform: [{scaleX: 0.77}, {scaleY: 0.77}],
+                              position: 'absolute',
+                              color: "#cccccc"
+                            }}
+                            itemStyle={{
+                              backgroundColor:"#000000"
+                            }}
+                            onValueChange={(itemValue, itemIndex) =>
+                              this.setState({district: itemValue})
+                            }>
+                            <Picker.Item label="Address" value="" />
+                            <Picker.Item label="Java" value="java" />
+                            <Picker.Item label="JavaScript" value="js" />
+                          </Picker>
+                        </View>
+                      </View>
+                    </Block>
 
-                <Block width={width * 0.9} style={{ marginBottom: 15 }}>
-                  <Input
-                    password
-                    viewPass
-                    borderless
-                    placeholder="Password"
-                    iconContent={
-                      <Icon
-                        size={16}
-                        color={'#5E5454'}
-                        name="padlock-unlocked"
-                        family="ArgonExtra"
-                        style={styles.inputIcons}
-                      />
-                    }
-                    style={{backgroundColor: '#333333'}}
-                  />                 
-                </Block> 
-                <Block width={width * 0.9} style={{ marginBottom: 15 }}>
-                  <Input
-                    password
-                    viewPass
-                    borderless
-                    placeholder="Re-enter password"
-                    iconContent={
-                      <Icon
-                        size={16}
-                        color={'#5E5454'}
-                        name="padlock-unlocked"
-                        family="ArgonExtra"
-                        style={styles.inputIcons}
-                      />
-                    }
-                    style={{backgroundColor: '#333333'}}
-                  />            
-                </Block>
+                    <Block width={width * 0.9} style={{ marginBottom: 15 }}>
+                      <Input
+                        password
+                        viewPass
+                        borderless
+                        placeholder="Password"
+                        iconContent={
+                          <Icon
+                            size={16}
+                            color={'white'}
+                            name="padlock-unlocked"
+                            family="ArgonExtra"
+                            style={styles.inputIcons}
+                          />
+                        }
+                        style={{backgroundColor: '#333333'}}
+                      />                 
+                    </Block> 
+                    <Block width={width * 0.9} style={{ marginBottom: 15 }}>
+                      <Input
+                        password
+                        viewPass
+                        borderless
+                        placeholder="Re-enter password"
+                        iconContent={
+                          <Icon
+                            size={16}
+                            color={'white'}
+                            name="padlock-unlocked"
+                            family="ArgonExtra"
+                            style={styles.inputIcons}
+                          />
+                        }
+                        style={{backgroundColor: '#333333'}}
+                      />            
+                    </Block>
 
-                <Block flex middle style={{marginBottom: height * 0.1}}>
-                  <Button color="primary" style={styles.loginButton} onPress={() => navigation.navigate("Register")}>
-                    <Text bold size={14} color={argonTheme.COLORS.WHITE}>
-                      Register
-                    </Text>
-                  </Button>
-                </Block>
-              </KeyboardAvoidingView>
+                    <Block middle style={{marginBottom: 20}}>
+                      <Button color="primary" style={styles.loginButton} onPress={() => navigation.navigate("Register")}>
+                        <Text bold size={14} color={'white'}>
+                          Register
+                        </Text>
+                      </Button>
+                    </Block>
+                  </ScrollView>
+                </KeyboardAvoidingView>
             </Block>
           </Block>
         </ImageBackground>

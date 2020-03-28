@@ -2,8 +2,8 @@ import React from "react";
 import { StyleSheet } from "react-native";
 import {
   createStackNavigator,
-  createDrawerNavigator,
-  createAppContainer
+  createAppContainer,
+  createSwitchNavigator
 } from "react-navigation";
 
 import { fadeIn } from 'react-navigation-transitions';
@@ -17,8 +17,8 @@ import ServiceInput from "../screens/ServiceInput";
 import ChangePassword from "../screens/ChangePassword";
 import Login from "../screens/Login";
 import Register from "../screens/Register";
-import ForgetPassword from "../screens/ForgetPassword"
-
+import ForgetPassword from "../screens/ForgetPassword";
+import AuthLoadingScreen from "../screens/AuthLoadingScreen";
 // drawer
 import { MaterialIcons } from '@expo/vector-icons';
 
@@ -46,14 +46,14 @@ const ProfileStack = createStackNavigator(
 
 const ServicesStack = createStackNavigator(
   {
-    ServiceInput: {
-      screen: ServiceInput,
+    Services: {
+      screen: Services,
       navigationOptions:{
         header: null
       }
     },
-    Services: {
-      screen: Services,
+    ServiceInput: {
+      screen: ServiceInput,
       navigationOptions:{
         header: null
       }
@@ -104,9 +104,9 @@ const LoginStack = createStackNavigator(
 );
 
 const TabNavigator = createBottomTabNavigator({
+  Home: HomeStack,
   Services: ServicesStack,
   Profile: ProfileStack,
-  Home: HomeStack,
 }, {
   defaultNavigationOptions: ({ navigation }) => {
     const route = navigation.state.routeName;
@@ -131,19 +131,25 @@ const TabNavigator = createBottomTabNavigator({
   }
 });
 
-const AppContainer = createAppContainer(createStackNavigator({
-  Main: {
-    screen: TabNavigator,
+const AppContainer = createAppContainer(createSwitchNavigator({
+  AuthLoading:{
+    screen: AuthLoadingScreen,  
     navigationOptions: {
-      header: null
+      header: null,
     }
-  }, 
+  },
   Account: {
     screen: LoginStack,  
     navigationOptions: {
       header: null,
     }
   }, 
+  Main: {
+    screen: TabNavigator,
+    navigationOptions: {
+      header: null
+    }
+  },
   }
 ));
 export default AppContainer;
