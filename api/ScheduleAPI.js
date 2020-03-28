@@ -2,7 +2,7 @@ import axios from 'axios';
 import Globals from '../globals/globals';
 import AuthAPI from './AuthAPI';
 
-export default class NotificationAPI{
+export default class ScheduleAPI{
     constructor() {
         this.globals = new Globals();
     }
@@ -34,7 +34,7 @@ export default class NotificationAPI{
         const url = this.globals.serverHost + '/api/schedule/'+id;
 
         let options = {
-            headers: {token: AuthAPI.retrevetoken(), 'Access-Control-Allow-Origin':'*'}
+            headers: {token: AuthAPI.retrievetoken(), 'Access-Control-Allow-Origin':'*'}
         }
 
         return axios.delete(url,options);
