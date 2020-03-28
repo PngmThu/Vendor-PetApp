@@ -1,5 +1,6 @@
 import axios from 'axios';
 import Globals from '../globals/globals';
+import AuthAPI from '../api/AuthAPI';
 
 export default class BookingAPI{
     constructor() {
