@@ -6,7 +6,8 @@ export default class BookingAPI{
         this.globals = new Globals();
     }
 
-    postBooking(token,petId,serviceId,vendorId,customerId){
+    createBooking(booking){
+        const token = AuthAPI.retrieveToken();
 
         const url = this.globals.serverHost + '/api/booking/add';
 
@@ -14,13 +15,15 @@ export default class BookingAPI{
             headers: {token: token, 'Access-Control-Allow-Origin':'*'}
         };
 
-        let body = {petId: petId, serviceId : serviceId, vendorId: vendorId, customerId:customerId};
+        let body = {booking};
 
         return axios.post(url, body, options);
     }
     
-    getBookingById(token, id){
-        const url = this.globals.serverHost + '/api/booking/' + id;
+    getBookingById(bookingId){
+        const token = AuthAPI.retrieveToken();
+
+        const url = this.globals.serverHost + '/api/booking/' + bookingId;
         
         let options = {
             headers: {token: token, 'Access-Control-Allow-Origin':'*'}
@@ -29,7 +32,9 @@ export default class BookingAPI{
         return axios.get(url,options);
     }
 
-    getBookingByVendorId(token, vendorId){
+    getBookingByVendorId(vendorId){
+        const token = AuthAPI.retrieveToken();
+
         const url = this.globals.serverHost + '/api/booking/vendor/' + vendorId;
         
         let options = {
@@ -39,7 +44,9 @@ export default class BookingAPI{
         return axios.get(url,options);
     }
 
-    getBookingByCustomerId(token, customerId){
+    getBookingByCustomerId(customerId){
+        const token = AuthAPI.retrieveToken();
+
         const url = this.globals.serverHost + '/api/booking/customer/' + customerId;
         
         let options = {
@@ -49,7 +56,9 @@ export default class BookingAPI{
         return axios.get(url,options);
     }
 
-    getBookingByPetId(token, PetId){
+    getBookingByPetId(PetId){
+        const token = AuthAPI.retrieveToken();
+
         const url = this.globals.serverHost + '/api/booking/pet/' + PetId;
         
         let options = {
@@ -59,7 +68,9 @@ export default class BookingAPI{
         return axios.get(url,options);
     }
 
-    deleteBookingById(token, bookingId){
+    deleteBookingById(bookingId){
+        const token = AuthAPI.retrieveToken();
+
         const url = this.globals.serverHost + '/api/booking/'+ bookingId;
 
         let options = {
@@ -69,14 +80,16 @@ export default class BookingAPI{
         return axios.delete(url,options);
     }
 
-    updateBookingById(token, bookingId, bookingStatus){
+    updateBookingById(bookingId, booking){
+        const token = AuthAPI.retrieveToken();
+
         const url = this.globals.serverHost + '/api/booking/'+ bookingId;
 
         let options = {
             headers: {token: token, 'Access-Control-Allow-Origin':'*'}
         }
 
-        let body = {status: bookingStatus}
+        let body = {booking}
 
         return axios.post(url, body, options)
 
