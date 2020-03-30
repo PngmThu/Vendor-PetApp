@@ -20,7 +20,6 @@ import Register from "../screens/Register";
 import ForgetPassword from "../screens/ForgetPassword";
 import AuthLoadingScreen from "../screens/AuthLoadingScreen";
 import Notification from "../screens/Notification";
-
 // drawer
 import { MaterialIcons } from '@expo/vector-icons';
 
@@ -95,6 +94,22 @@ const HomeStack = createStackNavigator(
   },
 );
 
+const NotificationStack = createStackNavigator(
+  {
+    Notification: {
+      screen: Notification,
+      navigationOptions: {
+        header: null,
+      }
+    },
+  },
+  {
+    transitionConfig: () => {
+        return fromRight(1000);
+    }
+  }
+);
+
 const LoginStack = createStackNavigator(
   {
     Login: {
@@ -111,17 +126,6 @@ const LoginStack = createStackNavigator(
     },
     ForgetPassword: {
       screen: ForgetPassword,  
-      navigationOptions: {
-        header: null,
-      }
-    },
-  },
-);
-
-const NotificationStack = createStackNavigator(
-  {
-    Notification: {
-      screen: Notification,
       navigationOptions: {
         header: null,
       }
