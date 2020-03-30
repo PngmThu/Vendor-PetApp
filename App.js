@@ -1,5 +1,5 @@
 import React from 'react';
-import { Image, NetInfo, Alert, Platform, BackHandler } from 'react-native';
+import { Image, NetInfo, Alert, Platform, BackHandler, StatusBar } from 'react-native';
 import { AppLoading } from 'expo';
 import { Asset } from 'expo-asset';
 import { Block, GalioProvider } from 'galio-framework';
@@ -68,8 +68,8 @@ export default class App extends React.Component {
       );
     } else {
       return (
-        <GalioProvider theme={argonTheme}>
-          <Block flex>
+        <GalioProvider theme={argonTheme} >
+          <Block flex style={{paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0}}>
             <Screens />
           </Block>
         </GalioProvider>

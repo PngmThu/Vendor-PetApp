@@ -6,7 +6,7 @@ import {
   createSwitchNavigator
 } from "react-navigation";
 
-import { fadeIn } from 'react-navigation-transitions';
+import { fadeIn, fromLeft, fromRight } from 'react-navigation-transitions';
 import { createBottomTabNavigator } from 'react-navigation-tabs';
 // screens
 import Home from "../screens/Home";
@@ -41,7 +41,12 @@ const ProfileStack = createStackNavigator(
       }
     }
   },
-
+  {
+    transitionConfig: () => {
+        return fromRight(1000);
+    },
+    transparentCard: true
+  }
 );
 
 const ServicesStack = createStackNavigator(
@@ -59,6 +64,11 @@ const ServicesStack = createStackNavigator(
       }
     },
   },
+  {
+    transitionConfig: () => {
+        return fromRight(1000);
+    },
+  }
 );
 
 const HomeStack = createStackNavigator(
@@ -76,7 +86,11 @@ const HomeStack = createStackNavigator(
       }
     }
   },
-
+  {
+    transitionConfig: () => {
+        return fromRight(1000);
+    },
+  },
 );
 
 const LoginStack = createStackNavigator(
@@ -100,7 +114,11 @@ const LoginStack = createStackNavigator(
       }
     },
   },
-
+  {
+    transitionConfig: () => {
+        return fromRight(1000);
+    }
+  }
 );
 
 const TabNavigator = createBottomTabNavigator({
@@ -128,6 +146,9 @@ const TabNavigator = createBottomTabNavigator({
         tabStyle: styles.tab,
       }
     }
+  },
+  transitionConfig: () => {
+    return fromRight(1000);
   }
 });
 
@@ -156,9 +177,12 @@ export default AppContainer;
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: 'rgba(45,45,45, 0.7)',
-    height: 40,
+    backgroundColor: 'rgba(45,45,45, 0.9)',
+    height: 45,
     position: 'absolute',
+    borderTopLeftRadius: 15,
+    borderTopRightRadius: 15,
+    borderTopWidth: 0
   },
   tab: {
     borderRadius: 20,

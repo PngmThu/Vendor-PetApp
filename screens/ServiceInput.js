@@ -134,18 +134,20 @@ class ServiceInput extends React.Component {
           <Popup visible={this.state.popUpDialog} choice={this.confirm} 
             question={this.state.createNew ? "Are you sure to create this service?" : "Are you sure to update this service?"}/> 
 
-          <Block flex={0.45} middle>
+          <Block style={{position: 'absolute', top: 0}}>
             <ImageBackground source={require("../assets/imgs/Schedule1.png")} resizeMode='contain' style={styles.headerImage}/>
-              <MaterialIcons name='keyboard-backspace' size={40} style={styles.backBtn}
-                                        onPress={() => navigation.navigate("Services")}/>
-              <Text color="#ffffff" size={40} style={{ marginLeft: 15, fontFamily: 'ITCKRIST'}}>
-                Service Info
-              </Text>
+              <View style={{width: width, alignContent: 'center', alignItems: 'center', top: 15}}>
+                <MaterialIcons name='keyboard-backspace' size={40} style={styles.backBtn}
+                                          onPress={() => navigation.navigate("Services")}/>
+                <Text color="#ffffff" size={40} style={{ marginLeft: 10, fontFamily: 'ITCKRIST'}}>
+                  Service Info
+                </Text>
+              </View>
           </Block>
 
-            <ScrollView>
+            <ScrollView style={{top: 110}}>
               {toggleBtn}
-              <Block flex={0.55} center>
+              <Block flex={1} center>
                 <KeyboardAvoidingView
                   style={{ flex: 1 }}
                   behavior="padding"
@@ -218,10 +220,10 @@ const styles = StyleSheet.create({
   },
   headerImage: {
     width: width,
-    height: height,
+    height: 90,
     justifyContent:'flex-start',
     borderRadius: 4,
-    position: 'absolute'
+    position: 'absolute',
   },
   registerContainer: {
     width: width * 0.9,  //0.9
@@ -289,10 +291,11 @@ const styles = StyleSheet.create({
   },
   backBtn: {
     position: 'absolute',
-    top: 40,
+    top: 10,
     marginLeft: 22,
     alignSelf: 'flex-start',
-    color: 'white'},
+    color: 'white'
+  },
   currency: {
     position: 'absolute',
     color: 'white',

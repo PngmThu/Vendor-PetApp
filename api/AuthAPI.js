@@ -19,6 +19,7 @@ export default class AuthAPI{
         .then(res => {
             if(res.status == 200){
                 this.storeToken(res.data.token);
+                this.storeVendorId(res.data.id);
                 callback(true);
             }
             else{
@@ -50,6 +51,29 @@ export default class AuthAPI{
         .catch(err => {
             callback(err.response.data)
         })
+    }
+
+    async storeVendorId(id){
+        try{
+            await AsyncStorage.setItem('id', id);
+        }
+        catch(err){
+            console.log(err);
+        }
+    }
+
+    async retrieveVendorId(){
+        try {
+            const value = await AsyncStorage.getItem('id');
+            if (value !== null) {
+              return value
+            }
+            else{
+                return null
+            }
+        } catch (error) {
+            return null
+        }
     }
 
     async storeToken(token){

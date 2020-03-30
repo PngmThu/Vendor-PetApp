@@ -85,14 +85,16 @@ class Profile extends React.Component {
         >
         
         <Popup visible={this.state.popUpDialog} choice={this.logout} question={"Do you want to log out?"}/> 
-        <Block flex={0.6} middle >
-          <ImageBackground source={require("../assets/imgs/Schedule1.png")} resizeMode='contain' style={styles.headerImage}/>
-          <Text color="#ffffff" size={40} style={{ marginLeft: 15, fontFamily: 'ITCKRIST'}}>
-            Your info
-          </Text>
-        </Block>
+        <Block style={{position: 'absolute', top: 0}}>
+            <ImageBackground source={require("../assets/imgs/Schedule1.png")} resizeMode='contain' style={styles.headerImage}/>
+              <View style={{width: width, alignContent: 'center', alignItems: 'center', top: 15}}>
+                <Text color="#ffffff" size={40} style={{ marginLeft: 10, fontFamily: 'ITCKRIST'}}>
+                  Service Info
+                </Text>
+              </View>
+          </Block>
 
-          <ScrollView>
+          <ScrollView style={{marginTop: 110}}>
             <Block flex={0.1} row style={styles.action} >
               <View style={{alignContent:'flex-start', flex:1, flexDirection: 'row'}} onTouchStart={(event) => {this.clickLogout(event)}}>
                 <MaterialCommunityIcons name="logout-variant" size={30} style={styles.logoutIcon}></MaterialCommunityIcons>
@@ -233,10 +235,10 @@ const styles = StyleSheet.create({
   },
   headerImage: {
     width: width,
-    height: height,
+    height: 90,
     justifyContent:'flex-start',
     borderRadius: 4,
-    position: 'absolute'
+    position: 'absolute',
   },
   registerContainer: {
     width: width * 0.9,  //0.9
