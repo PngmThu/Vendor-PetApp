@@ -19,6 +19,8 @@ import Login from "../screens/Login";
 import Register from "../screens/Register";
 import ForgetPassword from "../screens/ForgetPassword";
 import AuthLoadingScreen from "../screens/AuthLoadingScreen";
+import Notification from "../screens/Notification";
+
 // drawer
 import { MaterialIcons } from '@expo/vector-icons';
 
@@ -100,12 +102,23 @@ const LoginStack = createStackNavigator(
       }
     },
   },
+);
 
+const NotificationStack = createStackNavigator(
+  {
+    Notification: {
+      screen: Notification,
+      navigationOptions: {
+        header: null,
+      }
+    },
+  },
 );
 
 const TabNavigator = createBottomTabNavigator({
   Home: HomeStack,
   Services: ServicesStack,
+  Notification: NotificationStack,
   Profile: ProfileStack,
 }, {
   defaultNavigationOptions: ({ navigation }) => {
@@ -116,7 +129,8 @@ const TabNavigator = createBottomTabNavigator({
         const name = {
           'Home': 'apps',
           'Profile': 'person',
-          'Services': 'list'
+          'Services': 'list',
+          'Notification': 'mail'
         }[route]
         return <MaterialIcons name={name} color={tintColor} size={22} />
       },
