@@ -17,7 +17,7 @@ import { Button,
 import { Images, argonTheme } from "../constants";
 import VendorAPI from '../api/VendorAPI';
 import { MaterialIcons } from '@expo/vector-icons';
-
+import Loader from '../components/Loader';
 const { width, height } = Dimensions.get("screen");
 
 const headerImg = require("../assets/imgs/headerLogin.png");
@@ -34,7 +34,11 @@ class Register extends React.Component {
   }
 
   componentDidMount(){
-    this.retrieveData();
+    this.didFocus = this.props.navigation.addListener('willFocus', () => {
+      this.setState({loading: true}, () => {
+        this.retrieveData();
+      })
+    })
   }
 
   state = {
@@ -44,11 +48,13 @@ class Register extends React.Component {
     password: "",
     rePassword: "",
     vendorLocations: [],
+    location: "",
+    loading: true
   }
 
   retrieveData(){
     this.vendorAPI.getVendorLocation(res => {
-      this.setState({vendorLocations: res})
+      this.setState({vendorLocations: res, loading: false})
     })
   }
 
@@ -70,7 +76,7 @@ class Register extends React.Component {
       address: this.state.address,
       password: this.state.password
     });
-    console.log(this.vendor);
+
     this.vendorAPI.createVendor(this.vendor, (res) => {
       if(res == true){
         Alert.alert('Succesfully', 'User is created successfully! You can log in now',
@@ -111,9 +117,13 @@ class Register extends React.Component {
           backgroundColor:"#000000"
         }}
         onValueChange={(itemValue, itemIndex) =>
-          this.setState({address: itemValue})
+          {
+            var item = this.state.vendorLocations.find(v => {return v._id == itemValue});
+            this.setState({address: itemValue, location: item ? item.address : ""});
+          }
+          
       }>
-        <Picker.Item label="Address" value="" />
+        <Picker.Item label="Store" value="" />
         { this.renderPickerItem()}
       </Picker>
     )
@@ -122,7 +132,9 @@ class Register extends React.Component {
   
   render() {
     const { navigation } = this.props;
-
+    if(this.state.loading){
+      var loader = <Loader />
+    }
     return (
       <Block flex middle >
         
@@ -130,6 +142,7 @@ class Register extends React.Component {
           source={require("../assets/imgs/background2.gif")}
           style={{ width, height, zIndex: 1 }}
         >
+          {loader}
           <Block flex={0.3} middle>
             <ImageBackground source={require("../assets/imgs/headerRegister.png")} resizeMode='contain' style={styles.headerImage}>
                 <Block flex middle>
@@ -186,7 +199,7 @@ class Register extends React.Component {
                       />
                     </Block>
 
-                    <Block width={width * 0.9} style={{ marginBottom: 15 }}>
+                    <Block width={width * 0.9} style={{ marginBottom: 10 }}>
                       <View
                         style={{
                           flexDirection: 'row',
@@ -208,6 +221,7 @@ class Register extends React.Component {
                             {this.renderPicker()}
                         </View>
                       </View>
+                      <Text style={{fontSize: 12, color: 'white', marginTop: 5, marginLeft: 20}}>{"Location: " + this.state.location}</Text>
                     </Block>
 
                     <Block width={width * 0.9} style={{ marginBottom: 15 }}>

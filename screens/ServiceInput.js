@@ -9,7 +9,9 @@ import {
   View,
   ScrollView,
   TextInput,
-  SafeAreaView
+  SafeAreaView,
+  Alert,
+  Image
 } from "react-native";
 import { Block, Text, theme } from "galio-framework";
 import { argonTheme } from "../constants";
@@ -18,7 +20,7 @@ import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
 import Notification from '../models/NotificationModel';
 import ToggleSwitch from 'toggle-switch-react-native';
 import Popup from '../components/Popup';
-import Alert from '../components/Alert';
+import ServiceAPI from '../api/ServiceAPI';
 const { width, height } = Dimensions.get("screen");
 
 class ServiceInput extends React.Component {
@@ -30,8 +32,6 @@ class ServiceInput extends React.Component {
     description: "",
     createNew: false,
     obj: null,
-    alertDialog: false,
-    alertQuestion: ""
   }
 
   constructor(props){
@@ -40,7 +40,7 @@ class ServiceInput extends React.Component {
     this.clickSave = this.clickSave.bind(this);
     this.confirm = this.confirm.bind(this);
     this.validateInput = this.validateInput.bind(this);
-    this.dismissAlert = this.dismissAlert.bind(this);
+    this.serviceAPI = new ServiceAPI();
   }
 
   componentDidMount(){
@@ -57,7 +57,6 @@ class ServiceInput extends React.Component {
     var params = this.props.navigation.state.params;
     if(params){
       this.setState({createNew: params.createNew})
-      console.log(params.data);
       if(params.data){
         this.setState({price: params.data.price.toString(), name: params.data.name, 
           description: params.data.description, obj: params.data})
@@ -67,7 +66,7 @@ class ServiceInput extends React.Component {
       }
     }
     else{
-      this.props.navigation.navigate("Services");
+      this.props.navigation.goBack();
     }
   }
 
@@ -77,25 +76,62 @@ class ServiceInput extends React.Component {
     }
   }
 
-  confirm(bool){
+  async confirm(bool){
+    if(bool){
+      if(this.state.createNew){
+        let vendorId = await this.serviceAPI.authAPI.retrieveVendorId();
+
+        let service = new Object({
+          name: this.state.name,
+          price: this.state.price,
+          description: this.state.description,
+          vendorId: vendorId
+        })
+        
+        this.serviceAPI.createNewService(service, (res) => {
+          if(res){
+            Alert.alert('Successfully', "Service is created successfully!",
+            [{text: 'Ok', onPress: () => {this.props.navigation.goBack()}}])
+          }
+          else{
+            Alert.alert('Error', "Server error",
+            [{text: 'Ok'}])
+          }
+        })
+      }
+      else{
+        let service = this.state.obj;
+        service.name = this.state.name;
+        service.price = this.state.price;
+        service.description = this.state.description;
+        this.serviceAPI.updateService(service, (res) => {
+          if(res){
+            Alert.alert('Successfully', "Service is updated successfully!",
+            [{text: 'Ok', onPress: () => {this.props.navigation.goBack()}}])
+          }
+          else{
+            Alert.alert('Error', "Server error",
+            [{text: 'Ok'}])
+          }
+        })
+      }
+    }
     this.setState({popUpDialog: false, edit: false})
   }
 
   validateInput(){
     if(isNaN(this.state.price) || this.state.price <= 0){
-      this.setState({alertDialog: true, alertQuestion: 'Invalid price input'})
+      Alert.alert('Error', "Invalid price input",
+      [{text: 'Ok'}])
       return false;
     }
 
     if(this.state.name == ""){
-      this.setState({alertDialog: true, alertQuestion: 'Service name can not be empty'})
+      Alert.alert('Error', "Service name can not be empty",
+      [{text: 'Ok'}])
       return false;
     }
     return true
-  }
-
-  dismissAlert(){
-    this.setState({alertDialog: false})
   }
 
   render() {
@@ -129,8 +165,6 @@ class ServiceInput extends React.Component {
             source={require("../assets/imgs/background2.gif")}
             style={{ width, height, zIndex: 1 }}
           >
-
-          <Alert visible={this.state.alertDialog} dismiss={this.dismissAlert} question={this.state.alertQuestion}/> 
           <Popup visible={this.state.popUpDialog} choice={this.confirm} 
             question={this.state.createNew ? "Are you sure to create this service?" : "Are you sure to update this service?"}/> 
 
@@ -146,13 +180,18 @@ class ServiceInput extends React.Component {
           </Block>
 
             <ScrollView style={{top: 110}}>
-              {toggleBtn}
               <Block flex={1} center>
                 <KeyboardAvoidingView
                   style={{ flex: 1 }}
                   behavior="padding"
+                  keyboardVerticalOffset={300}
                   enabled
                 >
+                <Block flex middle>
+                  <Image source={require("../assets/imgs/store.png")} resizeMode='contain' 
+                          style={{width: 240, height: 160}}/>
+                </Block>
+                  {toggleBtn}
                   <Block width={width * 0.9} style={{marginTop: 20, marginBottom: 15 }}>
                     <Input
                       borderless
