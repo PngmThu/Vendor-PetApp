@@ -7,18 +7,15 @@ import {
   KeyboardAvoidingView,
   Picker,
   View,
-  Text
+  Text,
+  Alert
 } from "react-native";
 import { Block, Checkbox, theme } from "galio-framework";
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import { Button, 
   Icon, 
   Input, Select } from "../components";
 import { Images, argonTheme } from "../constants";
-import { TouchableOpacity } from "react-native-gesture-handler";
-
-import { Avatar } from 'react-native-elements';
-
+import VendorAPI from '../api/VendorAPI';
 import { MaterialIcons } from '@expo/vector-icons';
 
 const { width, height } = Dimensions.get("screen");
@@ -26,7 +23,103 @@ const { width, height } = Dimensions.get("screen");
 const headerImg = require("../assets/imgs/headerLogin.png");
 
 class Register extends React.Component {
-  state = {address: ""}
+  
+  constructor(props){
+    super(props);
+    this.handleRegister = this.handleRegister.bind(this);
+    this.retrieveData = this.retrieveData.bind(this);
+    this.renderPicker = this.renderPicker.bind(this);
+    this.renderPickerItem = this.renderPickerItem.bind(this);
+    this.vendorAPI = new VendorAPI();
+  }
+
+  componentDidMount(){
+    this.retrieveData();
+  }
+
+  state = {
+    address: "",
+    name: "",
+    email: "",
+    password: "",
+    rePassword: "",
+    vendorLocations: [],
+  }
+
+  retrieveData(){
+    this.vendorAPI.getVendorLocation(res => {
+      this.setState({vendorLocations: res})
+    })
+  }
+
+  handleRegister(){
+    if(!this.state.email || !this.state.name || !this.state.address || !this.state.password){
+      Alert.alert('Error', "Input field can not be empty",
+      [{text: 'Ok'}])
+      return;
+    }
+    else if(this.state.password != this.state.rePassword){
+      Alert.alert('Error', "Password field not match",
+      [{text: 'Ok'}]);
+      return;
+    }
+    this.vendor = new Object({
+      email: this.state.email,
+      mobile: this.state.phone,
+      name: this.state.name,
+      address: this.state.address,
+      password: this.state.password
+    });
+    console.log(this.vendor);
+    this.vendorAPI.createVendor(this.vendor, (res) => {
+      if(res == true){
+        Alert.alert('Succesfully', 'User is created successfully! You can log in now',
+          [{text: 'Ok' , onPress: () => this.props.navigation.navigate('Login')}]
+        );
+      }
+      else{
+        Alert.alert('Error', res,
+        [{text: 'Ok'}]);
+      }
+    })
+  }
+
+  renderPickerItem(){
+    let table  = []
+    for(var i = 0; i < this.state.vendorLocations.length; i ++){
+      table.push(
+        <Picker.Item key={i} label={this.state.vendorLocations[i].name} value={this.state.vendorLocations[i]._id} />
+      )
+    }
+    return table;
+  }
+
+  renderPicker(){
+    return(
+      <Picker
+        selectedValue={this.state.address}
+        style={{
+          width: '100%',
+          paddingBottom: 0,
+          backgroundColor: 'transparent',
+          paddingLeft: 0,
+          transform: [{scaleX: 0.77}, {scaleY: 0.77}],
+          position: 'absolute',
+          color: "#cccccc"
+        }}
+        itemStyle={{
+          backgroundColor:"#000000"
+        }}
+        onValueChange={(itemValue, itemIndex) =>
+          this.setState({address: itemValue})
+      }>
+        <Picker.Item label="Address" value="" />
+        { this.renderPickerItem()}
+      </Picker>
+    )
+
+  }
+  
   render() {
     const { navigation } = this.props;
 
@@ -60,6 +153,8 @@ class Register extends React.Component {
                       <Input
                         borderless
                         placeholder="Your name"
+                        onChangeText={(name) => {this.setState({name})}}
+                        value={this.state.name}
                         iconContent={
                           <Icon
                             size={16}
@@ -76,28 +171,13 @@ class Register extends React.Component {
                       <Input
                         borderless 
                         placeholder="Email"
+                        onChangeText={(email) => {this.setState({email})}}
+                        value={this.state.email}
                         iconContent={
                           <Icon
                             size={16}
                             color={'white'}
                             name="ic_mail_24px"
-                            family="ArgonExtra"
-                            style={styles.inputIcons}
-                          />
-                        }
-                        style={{backgroundColor: '#333333'}}
-                      />
-                    </Block>
-
-                    <Block width={width * 0.9} style={{ marginBottom: 15 }}>
-                      <Input
-                        borderless 
-                        placeholder="Phone number"
-                        iconContent={
-                          <MaterialIcons
-                            size={16}
-                            color={'white'}
-                            name="phone"
                             family="ArgonExtra"
                             style={styles.inputIcons}
                           />
@@ -125,27 +205,7 @@ class Register extends React.Component {
                             paddingLeft: 15
                           }}>
                           <MaterialIcons name="location-on" size={16} color="white" style={{marginRight: 10}} />
-                          <Picker
-                            selectedValue={this.state.district}
-                            style={{
-                              width: '100%',
-                              paddingBottom: 0,
-                              backgroundColor: 'transparent',
-                              paddingLeft: 0,
-                              transform: [{scaleX: 0.77}, {scaleY: 0.77}],
-                              position: 'absolute',
-                              color: "#cccccc"
-                            }}
-                            itemStyle={{
-                              backgroundColor:"#000000"
-                            }}
-                            onValueChange={(itemValue, itemIndex) =>
-                              this.setState({district: itemValue})
-                            }>
-                            <Picker.Item label="Address" value="" />
-                            <Picker.Item label="Java" value="java" />
-                            <Picker.Item label="JavaScript" value="js" />
-                          </Picker>
+                            {this.renderPicker()}
                         </View>
                       </View>
                     </Block>
@@ -156,6 +216,8 @@ class Register extends React.Component {
                         viewPass
                         borderless
                         placeholder="Password"
+                        onChangeText={(password) => {this.setState({password})}}
+                        value={this.state.password}
                         iconContent={
                           <Icon
                             size={16}
@@ -174,6 +236,8 @@ class Register extends React.Component {
                         viewPass
                         borderless
                         placeholder="Re-enter password"
+                        onChangeText={(rePassword) => {this.setState({rePassword})}}
+                        value={this.state.rePassword}
                         iconContent={
                           <Icon
                             size={16}
@@ -188,8 +252,8 @@ class Register extends React.Component {
                     </Block>
 
                     <Block middle style={{marginBottom: 20}}>
-                      <Button color="primary" style={styles.loginButton} onPress={() => navigation.navigate("Register")}>
-                        <Text bold size={14} color={'white'}>
+                      <Button color="primary" style={styles.loginButton} onPress={this.handleRegister}>
+                        <Text bold size={14} color={'white'} style={{color: 'white'}}>
                           Register
                         </Text>
                       </Button>

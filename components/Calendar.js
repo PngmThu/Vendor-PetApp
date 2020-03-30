@@ -14,6 +14,7 @@ class CalendarComponent extends React.Component {
         this.processDate = this.processDate.bind(this);
         this.todayDate = this.todayDate.bind(this);
         this.updateDate = this.updateDate.bind(this);
+        this.scrollTo = this.scrollTo.bind(this);
     }
 
     componentDidMount(){
@@ -23,7 +24,7 @@ class CalendarComponent extends React.Component {
         var bookedDate = this.props.bookedDate;
         var unavailableDate = this.props.unavailableDate;
         var markedDate = {}
-        console.log(bookedDate);
+
         for(var i = 0; i < bookedDate.length; i ++){
             markedDate[bookedDate[i]] = {selected: true, customStyles: bookedDay};
         }
@@ -68,6 +69,10 @@ class CalendarComponent extends React.Component {
         return year + "-" + month + "-" + day;
     }
 
+    scrollTo(day){
+        this.props.scrollTo(day.dateString);
+    }
+
     render() {
         const theme={
             calendarBackground: '#rgba(45, 45, 45, 0.8)',
@@ -100,7 +105,7 @@ class CalendarComponent extends React.Component {
                 markedDates={this.state.markedDate}
                 markingType={'custom'}
                 // Handler which gets executed on day press. Default = undefined
-                onDayPress={(day) => {this.setDate(day)}}
+                onDayPress={(day) => {this.scrollTo(day)}}
                 // Handler which gets executed on day long press. Default = undefined
                 onDayLongPress={(day) => {this.setDate(day)}}
                 // Month format in calendar title. Formatting values: http://arshaw.com/xdate/#Formatting
@@ -161,7 +166,7 @@ const unavailable = {
 
 const styles = StyleSheet.create({
     calendar: {
-        width: "100%",
+        width: "95%",
         borderRadius: 10
     },
   });

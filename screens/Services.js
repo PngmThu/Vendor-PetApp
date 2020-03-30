@@ -148,14 +148,14 @@ class Services extends React.Component {
         >
         
             <Popup visible={this.state.popUpDialog} choice={this.logout} question={"Do you want to log out?"}/> 
-            <Block flex={0.2} middle >
+            <Block flex={0.12} middle >
               <ImageBackground source={require("../assets/imgs/Schedule1.png")} resizeMode='contain' style={styles.headerImage}/>
               <Text color="#ffffff" size={40} style={{ marginLeft: 15, fontFamily: 'ITCKRIST'}}>
                   Services
               </Text>
             </Block>
 
-          <ScrollView style={{flex: 0.7, marginBottom: 60 }}>
+          <ScrollView style={{flex: 0.88, marginBottom: 60, marginTop: 20 }}>
               <Block center>
                 {this.renderCard()}
               </Block>

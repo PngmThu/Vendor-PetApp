@@ -19,7 +19,7 @@ import { TouchableOpacity, ScrollView } from "react-native-gesture-handler";
 
 import { Avatar } from 'react-native-elements';
 import AuthAPI from '../api/AuthAPI';
-
+import Loader from '../components/Loader';
 const { width, height } = Dimensions.get("screen");
 
 const headerImg = require("../assets/imgs/headerLogin.png");
@@ -27,7 +27,8 @@ const headerImg = require("../assets/imgs/headerLogin.png");
 class Login extends React.Component {
   state = {
     email: "",
-    password: ""
+    password: "",
+    loading: false,
   }
 
   constructor(props){
@@ -37,7 +38,9 @@ class Login extends React.Component {
   }
 
   login(){
+    this.setState({loading: true})
     this.authAPI.login(this.state.email, this.state.password, (res) => {
+      this.setState({loading: false})
       if(res == true){
         this.props.navigation.navigate('Home')
       }
@@ -50,7 +53,9 @@ class Login extends React.Component {
 
   render() {
     const { navigation } = this.props;
-
+    if(this.state.loading){
+      var loader = <Loader />
+    }
     return (
       // <Block flex middle> 
       <Block flex middle >
@@ -61,6 +66,7 @@ class Login extends React.Component {
           source={require("../assets/imgs/background2.gif")}
           style={{ width, height, zIndex: 1 }}
         >
+          {loader}
           <Block flex={0.62} middle>
           {/* <Block flex={1} top={true} style={{justifyContent:'flex-start'}}> */}
             <ImageBackground source={headerImg} resizeMode='contain' style={styles.headerImage}>
@@ -82,7 +88,7 @@ class Login extends React.Component {
                   behavior="padding" 
                   keyboardVerticalOffset={100}
               >
-                  <ScrollView>
+                  <ScrollView style={{paddingBottom: 50}}>
                   <Block width={width * 0.9} style={{ marginBottom: 15 }}>
                     <Input
                       borderless 

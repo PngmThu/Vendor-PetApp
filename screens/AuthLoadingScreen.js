@@ -1,13 +1,7 @@
 import React from 'react';
-import {
-  ActivityIndicator,
-  AsyncStorage,
-  StatusBar,
-  StyleSheet,
-  View,
-} from 'react-native';
+import Loader from '../components/Loader';
 import AuthAPI from '../api/AuthAPI';
-
+import {View} from 'react-native';
 export default class AuthLoadingScreen extends React.Component {
 
     constructor(props){
@@ -28,10 +22,10 @@ export default class AuthLoadingScreen extends React.Component {
     // Render any loading content that you like here
     render() {
         return (
-        <View>
-            <ActivityIndicator />
-            <StatusBar barStyle="default" />
-        </View>
+            <View style={{backgroundColor: '#333333'}}>
+                <Loader />
+            </View>
+
         );
     }
 }

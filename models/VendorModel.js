@@ -1,6 +1,6 @@
 import BaseModel from './BaseModel';
 
-export class Vendor extends BaseModel {
+export default class Vendor extends BaseModel {
 
 	constructor(obj) {
 		super(obj, Vendor.schema);
@@ -11,10 +11,7 @@ export class Vendor extends BaseModel {
         email: {type: 'string'},
         createdAt: {type: 'string'},
         updatedAt: {type: 'string'},
-        rememberToken: {type: 'string'},
-        mobile: {type: 'number'},
         name: {type: 'string'},
-        postalCode: {type: 'number'},
         address: {type: 'string'},
 		$key: {type: 'string'},
 	};

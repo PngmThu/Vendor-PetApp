@@ -3,18 +3,31 @@ import { StyleSheet, Dimensions, ScrollView, ImageBackground, View, TouchableOpa
 import { Block, theme, Text } from 'galio-framework';
 import Calendar from '../components/Calendar';
 import Popup from '../components/Popup';
+import Loader from '../components/Loader';
+import AuthAPI from '../api/AuthAPI';
+import ScheduleAPI from '../api/ScheduleAPI';
+import BookingAPI from '../api/BookingAPI';
+import VendorModel from '../models/VendorModel';
+import ServiceAPI from '../api/ServiceAPI';
 import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
+
 const { width, height } = Dimensions.get('screen');
 
 class Home extends React.Component {
 
   constructor(props){
     super(props);
+    this.authAPI = new AuthAPI();
+    this.scheduleAPI = new ScheduleAPI();
+    this.bookingAPI = new BookingAPI();
+    this.serviceAPI = new ServiceAPI();
     this.calendarRef = React.createRef();
     this.toggleDateStatus = this.toggleDateStatus.bind(this);
     this.scheduleDetail = this.scheduleDetail.bind(this);
     this.dateStatusChoice = this.dateStatusChoice.bind(this);
-    this.scheduleByMonth = this.scheduleByMonth.bind(this);
+    this.retrieveData = this.retrieveData.bind(this);
+    this.scrollTo = this.scrollTo.bind(this);
+    this.scrollPos = [];
   }
 
   state = {
@@ -22,22 +35,29 @@ class Home extends React.Component {
     question: null,
     clickedDate: null,
     unavailableDate: [],
-    bookedDate: []
+    bookedDate: [],
+    bookingData: [],
+    servicesData: [],
+    loading: true,
   }
 
   componentDidMount(){
-    this.scheduleByMonth('');
+    this.didFocus = this.props.navigation.addListener('willFocus', () => {
+      this.setState({loading: true}, () => {
+        this.retrieveData();
+      })
+    })
   }
 
-  scheduleDetail(event){
-    this.props.navigation.navigate("ScheduleDetails", {data: '123'});
+  componentWillUnmount(){
+    this.didFocus.remove();
+  }
+
+  scheduleDetail(index){
+    this.props.navigation.navigate("ScheduleDetails", {data: this.state.bookingData[index]});
   }
 
   toggleDateStatus(marked, date){
-
-    setTimeout(() => {
-      this.scrollview_ref.scrollTo({ x: 0, y: height*2, animated: true });
-    }, 1)
 
     this.setState({clickedDate: date});
     if(!marked){
@@ -57,93 +77,177 @@ class Home extends React.Component {
     this.setState({popUpDialog: false});
   }
 
-  scheduleByMonth(month){
-    this.setState({unavailableDate: ['2020-03-01', '2020-03-02'], bookedDate: ['2020-03-03', '2020-03-05'],
-                  }, () => {
-                    this.calendarRef.current.processDate();
-                  })
+  async retrieveData(month){
+    let vendorId = await this.authAPI.retrieveVendorId();
+    let vendor = new VendorModel({_id: vendorId});
+    
+    this.serviceAPI.getServiceByVendor(vendorId, (services) => {
+      this.setState({servicesData: services});
+
+      this.scheduleAPI.getUnavailableDateByVendor(vendor, (unavailable) => {
+        let unavailableDate = []
+  
+        unavailable.forEach(v => {
+          unavailableDate.push(v.date)
+        });
+  
+        this.bookingAPI.getBookingByVendorId(vendorId, (bookings) => {
+          let bookedDate = [];
+  
+          bookings.forEach(v => {
+            let time = new Date(v.time);
+            v.time = time;
+            let month = time.getMonth() < 9 ? "0" + (time.getMonth() + 1) : (time.getMonth() + 1);
+            let date = time.getDate() < 9 ? "0" + (time.getDate() + 1) : (time.getDate() + 1);
+            let parsedDate = time.getFullYear() + "-" + month + "-" + date;
+            
+            if(!bookedDate.includes(parsedDate)){
+              bookedDate.push(parsedDate);
+            }
+          }) 
+  
+          //bookings.sort((a, b) => { return a.time - b.time});
+          this.setState({unavailableDate: unavailableDate, bookedDate: bookedDate, bookingData: bookings}, () => {
+            this.calendarRef.current.processDate();
+            this.setState({loading: false})
+          })   
+        })
+      })
+    })
   }
 
   renderTimeSchedule(index){
     let table = [];
-    for(var i = index; i < this.state.bookedDate.length; i++){
+    let lastDate = this.state.bookingData[index].time;
+
+    for(var i = index; i < this.state.bookingData.length; i++){
+      let time = this.state.bookingData[i].time;
+      
+      if(!this.compareDate(lastDate, time)){
+        break;
+      }
+
       table.push(
-        <TouchableOpacity key={i} style={styles.leftDetail} onPress={() => {this.scheduleDetail(i)}}>
-          <Text style={styles.time}>09:00</Text>
-          <Text style={styles.service}>Hair cutting service</Text>
-          <MaterialIcons name="cancel" size={22} style={{...styles.statusIcon, color: 'red'}}/>
+        <TouchableOpacity key={i} style={styles.leftDetail} onPress={this.scheduleDetail.bind(this, i)}>
+          <Text style={styles.time}>{time.getHours()}:{time.getMinutes()}</Text>
+          <Text style={styles.service}>{this.state.servicesData.find( v => { return v._id == this.state.bookingData[i].serviceId}).name}</Text>
+          <MaterialCommunityIcons name={iconStatus[this.state.bookingData[i].status]} 
+            size={22} style={{...styles.statusIcon}} color={iconColor[this.state.bookingData[i].status]}/>
         </TouchableOpacity>
       )
     }
+
     return table
   }
 
-  renderDaySchedule(date){
+  renderDaySchedule(month){
     let table = [];
-    let lastDate = "";
+    let lastDate = new Date('0000-01-01');
     let counter = 0;
-    for(var i = 0; i < this.state.bookedDate.length; i++){
-        if(this.state.bookedDate[i]){
-          table.push(
-            <View key={counter} style={styles.agenda}>
-              <View style={styles.dayBackground}> 
-                  <Text style={styles.day}>2</Text>
-              </View>
 
-              <View style={styles.month}>
-                <Text style={styles.monthTxt}>Mar</Text>
-              </View>
+    for(var i = 0; i < this.state.bookingData.length; i++){
 
-              {this.renderTimeSchedule(i)}
+      if(!this.compareDate(lastDate, this.state.bookingData[i].time)){
+        lastDate = this.state.bookingData[i].time;
+        table.push(
+          <View key={counter} style={styles.agenda}
+            onLayout={event => {
+              const layout = event.nativeEvent.layout;
+              this.scrollPos.push(layout.y);
+            }}
+          >
+            <View style={styles.dayBackground}> 
+              <Text style={styles.day}>{lastDate.getDate() + 1}</Text>
             </View>
-          )
-        }
+
+            <View style={styles.month}>
+              <Text style={styles.monthTxt}>{monthName[lastDate.getMonth()]}</Text>
+            </View>
+
+            {this.renderTimeSchedule(i)}
+          </View>
+        )
+        
         counter += 1;
+      }
     }
+
     return table
+  }
+
+  compareDate(date1, date2){
+    if(date1.getMonth() == date2.getMonth() && date1.getDate() == date2.getDate() && date1.getFullYear() == date2.getFullYear()){
+      return true;
+    }
+
+    return false;
+  }
+
+  scrollTo(day){
+    let counter = 0;
+
+    for(var i = 0; i < this.state.bookedDate.length; i++){
+      if(day == this.state.bookedDate[i]){
+        break;
+      }
+      counter += 1;
+    }
+
+    this.scrollview_ref.scrollTo({ x: 0, y: this.scrollPos[counter], animated: true })
   }
 
   render() {
     const { navigation } = this.props;
+
+    if(this.state.loading){
+      var loader = <Loader />
+    }
+
     return (
       <Block flex center style={styles.home}>
         <ImageBackground
           source={require("../assets/imgs/background2.gif")}
           style={{ width, height, zIndex: 1 }}
         >
+          {loader}
           <Popup visible={this.state.popUpDialog} choice={this.dateStatusChoice} question={this.state.question}/>
-          <Block flex={0.1} middle>
+          <Block style={{position: 'absolute', top: 0}}>
             <ImageBackground source={require("../assets/imgs/Schedule1.png")} resizeMode='contain' style={styles.headerImage}/>
-            <Text color="#ffffff" size={40} style={{ marginLeft: 15, fontFamily: 'ITCKRIST'}}>
-              Schedule
-            </Text>
+              <View style={{width: width, alignContent: 'center', alignItems: 'center', top: 15}}>
+                <Text color="#ffffff" size={40} style={{ marginLeft: 10, fontFamily: 'ITCKRIST'}}>
+                  Service Info
+                </Text>
+              </View>
           </Block>
 
-          <Block flex={0.05} row center style={styles.annotation}>
-            <View style={{...styles.circle, backgroundColor: 'red'}}/>
-            <Text color="#ffffff" size={12} style={{ marginLeft: 5, marginRight: 10, fontFamily: 'opensans'}}>
-              Unavailable
-            </Text>
-            <View style={{...styles.circle, backgroundColor: '#ffecd9'}}/>
-            <Text color="#ffffff" size={12} style={{ marginLeft: 5, marginRight: 10, fontFamily: 'opensans'}}>
-              Booked
-            </Text>
-            <View style={{...styles.circle, backgroundColor: '#bd4902'}}/>
-            <Text color="#ffffff" size={12} style={{ marginLeft: 5, marginRight: 10, fontFamily: 'opensans'}}>
-              Today
-            </Text>
-          </Block>
+          <View style={{marginTop: 90, flex: 1}}>
+            <Block flex={0.02} row center style={styles.annotation}>
+              <View style={{...styles.circle, backgroundColor: 'red'}}/>
+              <Text color="#ffffff" size={12} style={{ marginLeft: 5, marginRight: 10, fontFamily: 'opensans'}}>
+                Unavailable
+              </Text>
+              <View style={{...styles.circle, backgroundColor: '#ffecd9'}}/>
+              <Text color="#ffffff" size={12} style={{ marginLeft: 5, marginRight: 10, fontFamily: 'opensans'}}>
+                Booked
+              </Text>
+              <View style={{...styles.circle, backgroundColor: '#bd4902'}}/>
+              <Text color="#ffffff" size={12} style={{ marginLeft: 5, marginRight: 10, fontFamily: 'opensans'}}>
+                Today
+              </Text>
+            </Block>
 
-          <Block flex={0.47} center style={styles.calendar}>
-            <Calendar ref={this.calendarRef} unavailableDate={this.state.unavailableDate} 
-                      bookedDate={this.state.bookedDate} markDate={this.state.clickedDate} toggleDateStatus={this.toggleDateStatus}/>
-          </Block>
+            <Block flex={0.57} center style={styles.calendar}>
+              <Calendar ref={this.calendarRef} unavailableDate={this.state.unavailableDate} scrollTo={this.scrollTo}
+                        bookedDate={this.state.bookedDate} markDate={this.state.clickedDate} toggleDateStatus={this.toggleDateStatus}/>
+            </Block>
 
-          <Block flex={0.33} center style={{width: width, paddingBottom: 50}}>
-            <ScrollView scrollToOverflowEnabled={true} bounces={true} style={{width: "100%"}}   ref={ref => {this.scrollview_ref = ref;}}>
-              {this.renderDaySchedule()}
-            </ScrollView>
-          </Block>
+            <Block flex={0.46} center style={{width: width, paddingBottom: 50}}>
+              <ScrollView scrollToOverflowEnabled={true} bounces={true} style={{width: "100%", marginBottom: 50}}  
+                      ref={ref => {this.scrollview_ref = ref;}}>
+                {this.renderDaySchedule()}
+              </ScrollView>
+            </Block>
+          </View>
         </ImageBackground>
       </Block>
     );
@@ -155,6 +259,12 @@ const iconStatus = {
   'booked': 'chevron-double-right',
   'completed': 'check-circle'
 }
+const iconColor = {
+  'cancelled': 'red',
+  'booked': 'orange',
+  'completed': 'green'
+}
+const monthName = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
 
 const styles = StyleSheet.create({
   home: {
@@ -164,14 +274,14 @@ const styles = StyleSheet.create({
   },
   headerImage: {
     width: width,
-    height: height,
+    height: 90,
     justifyContent:'flex-start',
     borderRadius: 4,
-    position: 'absolute'
+    position: 'absolute',
   },
   calendar: {
     width: "95%",
-    height: "100%",
+    height: "95%",
     borderRadius: 15,
     elevation: 2,
     justifyContent: 'center'
@@ -183,7 +293,7 @@ const styles = StyleSheet.create({
     elevation: 2
   },
   annotation: {
-    marginTop: 10,
+    paddingTop: 20,
     marginBottom:0
   },
   agenda: {
@@ -196,7 +306,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     alignSelf: 'flex-end',
     backgroundColor: 'rgba(45, 45, 45, 0.8)',
-    height: 80,
+    height: 60,
     paddingLeft: 20,
     paddingRight: 20,
     justifyContent: "center",
@@ -204,31 +314,31 @@ const styles = StyleSheet.create({
   },
   service: {
     fontFamily: "opensans",
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: "300",
     color: "white"
   },
   time: {
     fontFamily: "opensans",
-    fontSize: 19,
+    fontSize: 17,
     fontWeight: "600",
     color: "white"
   },
   dayBackground: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
     elevation: 2,
     backgroundColor: "#FF9B70",
     alignSelf: "flex-start",
     position: 'absolute',
     justifyContent: 'center',
-    marginLeft: 10,
+    marginLeft: 15,
     marginTop: 5
   },
   day: {
     fontFamily: "opensans",
-    fontSize: 30,
+    fontSize: 20,
     fontWeight: "600",
     textAlign: "center",
     color: "white"
@@ -242,15 +352,15 @@ const styles = StyleSheet.create({
   },
   month:{
     position: 'absolute',
-    marginLeft: 17,
+    marginLeft: 22,
     alignSelf: 'flex-start',
-    marginTop: 60
+    marginTop: 45
   },
   monthTxt: {
     color: 'white',
     fontFamily: 'opensans',
     fontWeight: '600',
-    fontSize: 20,
+    fontSize: 17,
     textAlign: 'center'
   }
 });
