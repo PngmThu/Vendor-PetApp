@@ -17,6 +17,9 @@ import Notification from '../models/NotificationModel';
 import ToggleSwitch from 'toggle-switch-react-native';
 import Popup from '../components/Popup';
 import AuthAPI from '../api/AuthAPI';
+import VendorModel from '../models/VendorModel';
+import VendorProfileAPI from '../api/VendorProfileAPI'
+import VendorAPI from '../api/VendorAPI'
 
 const { width, height } = Dimensions.get("screen");
 
@@ -36,6 +39,39 @@ class Profile extends React.Component {
     this.logout = this.logout.bind(this);
     this.clickLogout = this.clickLogout.bind(this);
     this.authAPI = new AuthAPI();
+    this.vendorProfileAPI = new VendorProfileAPI();
+    this.vendorAPI = new VendorAPI();
+    this.retrieveData = this.retrieveData.bind(this); 
+    this.retrieveLocationData = this.retrieveData.bind(this);
+    this.saveAddress = null
+  }
+
+  componentDidMount(){
+    this.didFocus = this.props.navigation.addListener('willFocus', () => {
+      this.setState({ loading: true }, () => {
+        this.retrieveData();
+      })
+    })
+  }
+
+  componentWillUnmount(){
+    this.didFocus.remove();
+  }
+
+  async retrieveData(){
+    let vendorId = await this.authAPI.retrieveVendorId();
+    
+    this.vendorProfileAPI.getUserById(vendorId, (vendorProfile) => {
+      this.setState({name: vendorProfile.name, email: vendorProfile.email, mobile: vendorProfile.mobile})
+      let saveAddress = vendorProfile.address;
+
+      console.log(saveAddress);
+
+      this.vendorAPI.getVendorLocationById(saveAddress, (vendorLocation) => {
+        console.log(vendorLocation);
+        this.setState({address: vendorLocation.address});
+    })
+    })
   }
 
   register(){
@@ -89,7 +125,7 @@ class Profile extends React.Component {
             <ImageBackground source={require("../assets/imgs/Schedule1.png")} resizeMode='contain' style={styles.headerImage}/>
               <View style={{width: width, alignContent: 'center', alignItems: 'center', top: 15}}>
                 <Text color="#ffffff" size={40} style={{ marginLeft: 10, fontFamily: 'ITCKRIST'}}>
-                  Service Info
+                  My Profile
                 </Text>
               </View>
           </Block>
@@ -178,37 +214,23 @@ class Profile extends React.Component {
                 </Block>
 
                 <Block width={width * 0.9} style={{ marginBottom: 15 }}>
-                  <View
-                    style={{
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                      backgroundColor: '#333333',
-                      borderRadius: 9
-                    }}>
-                    <View
-                      style={{
-                        width: '100%',
-                        flexDirection: 'row',
-                        flex: 1,
-                        position: 'relative',
-                        alignItems: 'center',
-                        height: 44,
-                        paddingLeft: 15
-                      }}>
-                      <MaterialIcons name="location-on" size={16} color="#ffffff" style={{marginRight: 10}} />
-                      <Picker
-                        onValueChange={(address, index) => {this.setState({address})}}
-                        selectedValue={this.state.address}
-                        enabled={this.state.edit}
-                        style={styles.picker}
-                        itemStyle={this.state.edit ? {backgroundColor: '#333333'}: {backgroundColor: '#1f1f1f'}}
-                      >
-                        <Picker.Item label="Address" value="" />
-                        <Picker.Item label="Java" value="java" />
-                        <Picker.Item label="JavaScript" value="js" />
-                      </Picker>
-                    </View>
-                  </View>
+                  <Input
+                    borderless 
+                    placeholder="Address"
+                    editable={this.state.edit}
+                    onChangeText={(address) => {this.setState({address})}}
+                    value={this.state.address}
+                    iconContent={
+                      <MaterialIcons
+                        size={16}
+                        color={'#ffffff'}
+                        name="location-on"
+                        family="ArgonExtra"
+                        style={styles.inputIcons}
+                      />
+                    }
+                    style={this.state.edit ? {backgroundColor: '#333333'}: {backgroundColor: '#1f1f1f'}}
+                  />
                 </Block>
 
                 <Block flex={0.1} middle style={{marginBottom: height * 0.1}}>
@@ -299,3 +321,37 @@ const styles = StyleSheet.create({
 });
 
 export default Profile;
+
+/*<Block width={width * 0.9} style={{ marginBottom: 15 }}>
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      backgroundColor: '#333333',
+                      borderRadius: 9
+                    }}>
+                    <View
+                      style={{
+                        width: '100%',
+                        flexDirection: 'row',
+                        flex: 1,
+                        position: 'relative',
+                        alignItems: 'center',
+                        height: 44,
+                        paddingLeft: 15
+                      }}>
+                      <MaterialIcons name="location-on" size={16} color="#ffffff" style={{marginRight: 10}} />
+                      <Picker
+                        onValueChange={(address, index) => {this.setState({address})}}
+                        selectedValue={this.state.address}
+                        enabled={this.state.edit}
+                        style={styles.picker}
+                        itemStyle={this.state.edit ? {backgroundColor: '#333333'}: {backgroundColor: '#1f1f1f'}}
+                      >
+                        <Picker.Item label="Address" value="" />
+                        <Picker.Item label="Java" value="java" />
+                        <Picker.Item label="JavaScript" value="js" />
+                      </Picker>
+                    </View>
+                  </View>
+                </Block>*/
