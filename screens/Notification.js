@@ -41,14 +41,14 @@ async componentDidMount(){
     if (!err) {
       var result=[];
       var count = 0
-      console.log("Yesssssss")
+      // console.log("Yesssssss")
       console.log(res)
         // Promise.all(
         res.forEach( (notif)=>
         { 
            this.customerAPI.getCustomerById(notif.customerId, (err,customer)=>{
             if (!err) {
-                console.log('lalalalallala')
+                // console.log('lalalalallala')
                         
                         notif.time = new Date(notif.time);
                         result.push(<View style={styles.agenda}>
