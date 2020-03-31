@@ -30,32 +30,24 @@ export default class NotificationAPI{
         return axios.get(url, options)
     }
 
-    async getNotificationByVendor(vendorId,callback){
+    async getNotificationByVendor(vendorId, callback){
 
         const url = this.globals.serverHost + '/api/notification/vendor/'+vendorId;
         const token = await this.authAPI.retrieveToken();
+        
         let options = {
             headers: {'token':token, 'Access-Control-Allow-Origin':'*'}
         };
-        // console.log("options: "+options.headers['token'])
-        // console.log("aaaaa");
-        await axios.get(url,options)
-             .then(res=>{
-                 if (res.status==200){
-                     console.log(res)
-                     callback(false,res.data);
-                 }
-                 else {
-                     console.log("errr1")
-                     callback(res.data);
-                 }
-             })
-             .catch(err=>{
-                 console.log("error2")
-                 callback(err);
-             })
-
-        // console.log('jeljwelrj')
+        console.log(url)
+        axios.get(url, options)
+        .then(res=>{
+            if (res.status==200){
+                callback(res.data);
+            }
+        })
+        .catch(err=>{
+            console.log(err)
+        })
     }
 
 }

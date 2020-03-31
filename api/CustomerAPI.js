@@ -8,7 +8,7 @@ export default class CustomerAPI{
         this.authAPI = new AuthAPI();
     }
 
-    async getCustomerById(customerId,callback){
+    async getCustomerById(customerId, callback){
         const token = await this.authAPI.retrieveToken();
 
         const url = this.globals.serverHost + '/api/customer/'+ customerId;
@@ -17,14 +17,15 @@ export default class CustomerAPI{
             headers: {token: token, 'Access-Control-Allow-Origin':'*'}
         };
 
-        await axios.get(url, options).then( (res)=>{
-            if (res.status!=200) 
-            {
-                callback("Error");
-                console.log("Pet here")}
-            else {
-                callback(false,res.data)}
-        }
-        )
+        axios.get(url, options)
+        .then( res =>{
+            if (res.status == 200){
+                callback(res)
+            }
+        })
+        .catch(err => {
+            callback(false);
+            console.log(err)
+        })
     }
 }
