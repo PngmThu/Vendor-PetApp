@@ -40,7 +40,8 @@
     "react-navigation-tabs": "^2.8.5",
     "react-navigation-transitions": "^1.0.12",
     "toggle-switch-react": "^1.0.0",
-    "toggle-switch-react-native": "^2.1.0"
+    "toggle-switch-react-native": "^2.1.0",
+    "expo-permissions": "~7.0.0"
   },
   "devDependencies": {
     "babel-preset-expo": "^7.0.0"

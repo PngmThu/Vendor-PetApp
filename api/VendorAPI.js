@@ -36,7 +36,7 @@ export default class VendorAPI{
         const url = this.globals.serverHost + '/api/vendorLocation';
         
         let options = {
-            headers: {token: token, 'Access-Control-Allow-Origin':'*'}
+            headers: {'Access-Control-Allow-Origin':'*'}
         }
 
         axios.get(url, options)
@@ -51,8 +51,6 @@ export default class VendorAPI{
     }
 
     async getVendorLocationById(id, callback){
-        const token = await this.authAPI.retrieveToken();
-
         const url = this.globals.serverHost + '/api/vendorLocation/' + id;
         
         let options = {

@@ -1,6 +1,7 @@
 import {AsyncStorage} from 'react-native';
 import axios from 'axios';
 import Globals from '../globals/globals';
+import { Notifications } from 'expo';
 
 export default class AuthAPI{
     constructor(){
@@ -18,6 +19,7 @@ export default class AuthAPI{
         axios.post(url, body, options)
         .then(res => {
             if(res.status == 200){
+                this.registerDevice(res.data.token, res.data.id);
                 this.storeToken(res.data.token);
                 this.storeVendorId(res.data.id);
                 callback(true);
@@ -47,6 +49,25 @@ export default class AuthAPI{
             else{
                 callback("Authentication error!")
             }
+        })
+        .catch(err => {
+            callback(err.response.data)
+        })
+    }
+
+    async registerDevice(token, userId){
+        const url = this.globals.serverHost + '/api/serviceNotification';
+        let deviceId = await Notifications.getExpoPushTokenAsync();
+
+        let options = {
+            headers: {token: token, 'Access-Control-Allow-Origin':'*', Accept: 'application/json'}
+        };
+
+        let body = {userId: userId, deviceId: deviceId};
+
+        axios.post(url, body, options)
+        .then(res => {
+            console.log(res);
         })
         .catch(err => {
             callback(err.response.data)

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import { Image, NetInfo, Alert, Platform, BackHandler, StatusBar } from 'react-native';
 import { AppLoading } from 'expo';
 import { Asset } from 'expo-asset';
@@ -6,7 +6,7 @@ import { Block, GalioProvider } from 'galio-framework';
 import * as Font from 'expo-font';
 import Screens from './navigation/Screens';
 import { Images, articles, argonTheme } from './constants';
-
+import { Notifications } from 'expo';
 // cache app images
 const assetImages = [
   Images.Onboarding,
@@ -40,6 +40,7 @@ export default class App extends React.Component {
 
   componentDidMount(){
     this.CheckConnectivity();
+    this._notificationSubscription = Notifications.addListener(this._handleNotification);
   }
 
   CheckConnectivity(){
@@ -97,4 +98,6 @@ export default class App extends React.Component {
     this.setState({ isLoadingComplete: true });
   };
 
+  _handleNotification = notification => {
+  };
 }
