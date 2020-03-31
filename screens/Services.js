@@ -5,53 +5,19 @@ import {
   Dimensions,
   TouchableOpacity,
   View,
-  ScrollView
+  ScrollView,
+  Image
 } from "react-native";
 import { Block, Text, theme } from "galio-framework";
 import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
-import Notification from '../models/NotificationModel';
 import Popup from '../components/Popup';
+import ServiceAPI from '../api/ServiceAPI';
 const { width, height } = Dimensions.get("screen");
 
 class Services extends React.Component {
   state = {
     popUpDialog: false,
-    services: [{
-            name: "Grooming",
-            price: 12,
-            description: "jnjsfdv"
-        },
-        {
-            name: "Grooming",
-            price: 12,
-            description: "jnjsfdv"
-        },
-        {
-            name: "Grooming",
-            price: 12,
-            description: "jnjsfdv"
-        },
-        {
-            name: "Grooming",
-            price: 12,
-            description: "jnjsfdv"
-        },
-        {
-            name: "Grooming",
-            price: 12,
-            description: "jnjsfdv"
-        },
-        {
-            name: "Grooming",
-            price: 12,
-            description: "jnjsfdv"
-        },
-        {
-            name: "Grooming",
-            price: 12,
-            description: "jnjsfdv"
-        }
-    ]
+    services: []
   }
 
   constructor(props){
@@ -62,19 +28,26 @@ class Services extends React.Component {
     this.renderCard = this.renderCard.bind(this);
     this.updateService = this.updateService.bind(this);
     this.createService = this.createService.bind(this);
+    this.retrieveData = this.retrieveData.bind(this);
+    this.serviceAPI = new ServiceAPI();
+  }
+
+  componentDidMount(){
+    this.didFocus = this.props.navigation.addListener('willFocus', () => {
+      this.setState({loading: true}, () => {
+        this.retrieveData();
+      })
+    })
+  }
+
+  async retrieveData(){
+    let vendorId = await this.serviceAPI.authAPI.retrieveVendorId();
+    this.serviceAPI.getServiceByVendor(vendorId, (res) => {
+      this.setState({services: res})
+    })
   }
 
   register(){
-    let noti = new Notification({
-      content: "123",
-      time: "14:00",
-      vendor: {
-        name: 123,
-        $key: 111
-      }
-    })
-
-    noti.resolveData();
   }
 
   logout(bool){
@@ -100,21 +73,22 @@ class Services extends React.Component {
     var table = [];
     this.state.services.forEach((item, index) => {
         if(index % 2 == 0 && index + 1 < this.state.services.length){
+            var oddItem = this.state.services[index + 1];
             table.push(
                 <Block key={index} style={styles.container}>
                     <TouchableOpacity style={{...styles.cardService, marginRight: 10}} onPress={() => {this.updateService(item)}}>
-                        <MaterialIcons name='pets' size={40} style={styles.petIcon}/>
+                        <Image source={require('../assets/imgs/pet.png')} style={{resizeMode: 'contain', width: 60, height: 60, marginTop: 10, paddingTop: 10}}/>
                         <Text style={styles.priceTxt}>Price: {item.price} SGD</Text>
                         <View style={styles.cardFooter}>
                             <Text style={styles.itemTxt}>{item.name}</Text>
                         </View>
                     </TouchableOpacity>
 
-                    <TouchableOpacity style={{...styles.cardService}}  onPress={() => {this.updateService(item)}}>
-                        <MaterialIcons name='pets' size={40} style={styles.petIcon}/>
-                        <Text style={styles.priceTxt}>Price: {item.price} SGD</Text>
+                    <TouchableOpacity style={{...styles.cardService}}  onPress={() => {this.updateService(oddItem)}}>
+                        <Image source={require('../assets/imgs/pet.png')} style={{resizeMode: 'contain', width: 60, height: 60, marginTop: 10, paddingTop: 10}}/>
+                        <Text style={styles.priceTxt}>Price: {oddItem.price} SGD</Text>
                         <View style={styles.cardFooter}>
-                            <Text style={styles.itemTxt}>{item.name}</Text>
+                            <Text style={styles.itemTxt}>{oddItem.name}</Text>
                         </View>
                     </TouchableOpacity>
                 </Block>
@@ -124,7 +98,7 @@ class Services extends React.Component {
             table.push(
                 <Block key={index} style={styles.container}>
                     <TouchableOpacity style={{...styles.cardService}} onPress={() => {this.updateService(item)}}>
-                        <MaterialIcons name='pets' size={40} style={styles.petIcon}/>
+                        <Image source={require('../assets/imgs/pet.png')} style={{resizeMode: 'contain', width: 60, height: 60, marginTop: 10, paddingTop: 10}}/> 
                         <Text style={styles.priceTxt}>Price: {item.price} SGD</Text>
                         <View style={styles.cardFooter}>
                             <Text style={styles.itemTxt}>{item.name}</Text>
@@ -155,7 +129,7 @@ class Services extends React.Component {
               </Text>
             </Block>
 
-          <ScrollView style={{flex: 0.88, marginBottom: 60, marginTop: 20 }}>
+          <ScrollView style={{flex: 0.88, marginBottom: 120, marginTop: 20 }}>
               <Block center>
                 {this.renderCard()}
               </Block>
@@ -234,7 +208,7 @@ const styles = StyleSheet.create({
     alignSelf: "flex-end",
     alignItems: "center",
     right: 30,
-    bottom: 100
+    bottom: 150
   },
   addIcon: {
       color: "white",
