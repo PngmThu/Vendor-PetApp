@@ -37,8 +37,8 @@ export default class NotificationAPI{
         let options = {
             headers: {'token':token, 'Access-Control-Allow-Origin':'*'}
         };
-        console.log("options: "+options.headers['token'])
-        console.log("aaaaa");
+        // console.log("options: "+options.headers['token'])
+        // console.log("aaaaa");
         await axios.get(url,options)
              .then(res=>{
                  if (res.status==200){
@@ -55,7 +55,7 @@ export default class NotificationAPI{
                  callback(err);
              })
 
-        console.log('jeljwelrj')
+        // console.log('jeljwelrj')
     }
 
 }
