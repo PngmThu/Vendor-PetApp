@@ -42,7 +42,7 @@ async componentDidMount(){
       var result=[];
       var count = 0
       console.log("Yesssssss")
-      
+      console.log(res)
         // Promise.all(
         res.forEach( (notif)=>
         { 
@@ -53,16 +53,16 @@ async componentDidMount(){
                         notif.time = new Date(notif.time);
                         result.push(<View style={styles.agenda}>
                         <View style={styles.leftDetail}>
-                          <View style={{ flexDirection: 'row', backgroundColor: "purple", marginTop: 20, marginLeft: 40, width: 40, height: 40, borderRadius: 20 }}>
+                          <View style={{ flexDirection: 'row', backgroundColor: "purple", marginTop: 5, marginLeft:10, width: 40, height: 40, borderRadius: 20 }}>
                             <Icon
                               size={30}
                               color={'#ffffff'}
-                              name="i c_mail_24px"
+                              name="ic_mail_24px"
                               family="ArgonExtra"
                               style={styles.inputIcons}
                             />
                           </View>
-                          <Text style={{fontWeight:'100', fontSize: 17.5, color: '#ffffff', alignSelf: 'center'}}>
+                          <Text style={{fontWeight:'100', fontSize: 17.5, color: '#ffffff', paddingTop: 0, paddingLeft: 10, paddingRight: 10}}>
                           Your booking with customer {customer.firstName} {customer.lastName} on {notif.time.getDate()+1} - 
                           {notif.time.getMonth()+1} - {notif.time.getFullYear()} is {notif. bookingStatus}       </Text>
                         </View>
