@@ -15,16 +15,15 @@ export default class CustomerAPI{
 
         let options = {
             headers: {token: token, 'Access-Control-Allow-Origin':'*'}
-        };
+        }
 
         axios.get(url, options)
         .then( res =>{
             if (res.status == 200){
-                callback(res)
+                callback(res.data)
             }
         })
         .catch(err => {
-            callback(false);
             console.log(err)
         })
     }

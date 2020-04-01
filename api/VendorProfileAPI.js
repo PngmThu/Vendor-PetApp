@@ -8,10 +8,10 @@ export default class VendorProfileAPI{
         this.authAPI = new AuthAPI();
     }
 
-    async updateUserById(vendor, vendorId, callback){
+    async updateUserById(vendor, callback){
         const token = await this.authAPI.retrieveToken();
 
-        const url = this.globals.serverHost + '/api/vendor/' + vendorId;
+        const url = this.globals.serverHost + '/api/vendor/' + vendor._id;
 
         let options = {
             headers: {token: token, 'Access-Control-Allow-Origin':'*'}
@@ -31,8 +31,8 @@ export default class VendorProfileAPI{
         })
     }
 
-    updatePasswordById(vendor, vendorId){
-        const token = AuthAPI.retrieveToken();
+    async updatePassword(vendorId, password, callback){
+        const token = await this.authAPI.retrieveToken();
 
         const url = this.globals.serverHost + '/api/vendor/password/' + vendorId;
 
@@ -40,8 +40,21 @@ export default class VendorProfileAPI{
             headers: {token: token, 'Access-Control-Allow-Origin':'*'}
         };
 
-        let body = {vendor};
-        return axios.post(url, body, options)
+        let body = {password: password};
+
+        axios.put(url, body, options)
+        .then(res => {
+            if(res.status == 200){
+                callback(true);
+            }
+            else{
+                callback(false);
+            }
+        })
+        .catch(err => {
+            callback(false);
+            console.log(err.response.data)
+        })
 
     }
 

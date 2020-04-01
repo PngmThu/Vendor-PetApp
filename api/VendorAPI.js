@@ -51,7 +51,7 @@ export default class VendorAPI{
     }
 
     async getVendorLocationById(id, callback){
-        const url = this.globals.serverHost + '/api/vendorLocation/' + id;
+        const url = this.globals.serverHost + '/api/vendorLocation/vendor/' + id;
         
         let options = {
             headers: {'Access-Control-Allow-Origin':'*'}

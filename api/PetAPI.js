@@ -5,10 +5,11 @@ import AuthAPI from '../api/AuthAPI';
 export default class PetAPI{
     constructor() {
         this.globals = new Globals();
+        this.authAPI = new AuthAPI();
     }
 
     createPet(pet){
-        const token = AuthAPI.retrieveToken();
+        const token = this.authAPI.retrieveToken();
 
         const url = this.globals.serverHost + '/api/pet/add';
 
@@ -22,7 +23,7 @@ export default class PetAPI{
     }
 
     updatePetById(pet, petId){
-        const token = AuthAPI.retrieveToken();
+        const token = this.authAPI.retrieveToken();
 
         const url = this.globals.serverHost + '/api/pet/' + petId;
 
@@ -35,7 +36,7 @@ export default class PetAPI{
 
     }
 
-    async getPetById(petId,callback){
+    async getPetById(petId, callback){
         const token = await this.authAPI.retrieveToken();
 
         const url = this.globals.serverHost + '/api/pet/'+ petId;
@@ -43,20 +44,22 @@ export default class PetAPI{
         let options = {
             headers: {token: token, 'Access-Control-Allow-Origin':'*'}
         };
-
-        await axios.get(url, options).then( (res)=>{
-            if (res.status!=200) 
-            {
-                callback("Error");
-                console.log("Pet here")}
+        axios.get(url, options).then((res) => {
+            if (res.status != 200){
+                callback(false);
+            }
             else {
-                callback(false,res.data)}
-        }
-        )
+                callback(res.data)
+            }
+        })
+        .catch(err => {
+            console.log(err.response.data);
+            callback(false);
+        })
     }
 
     getPetByCustomerId(customerId){
-        const token = AuthAPI.retrieveToken();
+        const token = this.authAPI.retrieveToken();
 
         const url = this.globals.serverHost + '/api/pet/customer/'+ customerId;
 
@@ -68,7 +71,7 @@ export default class PetAPI{
     }
 
     deletePetByPetId(petId){
-        const token = AuthAPI.retrieveToken();
+        const token = this.authAPI.retrieveToken();
 
         const url = this.globals.serverHost + '/api/pet/'+ petId;
 

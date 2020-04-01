@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, Dimensions, ScrollView, ImageBackground, View, TouchableOpacity } from 'react-native';
+import { StyleSheet, Dimensions, ScrollView, ImageBackground, View, TouchableOpacity, Alert } from 'react-native';
 import { Block, theme, Text } from 'galio-framework';
 import Calendar from '../components/Calendar';
 import Popup from '../components/Popup';
@@ -27,7 +27,10 @@ class Home extends React.Component {
     this.dateStatusChoice = this.dateStatusChoice.bind(this);
     this.retrieveData = this.retrieveData.bind(this);
     this.scrollTo = this.scrollTo.bind(this);
+    this.queryCurrentMonth = this.queryCurrentMonth.bind(this);
     this.scrollPos = [];
+    this.lastFromTime = null;
+    this.lastToTime = null;
   }
 
   state = {
@@ -38,14 +41,19 @@ class Home extends React.Component {
     bookedDate: [],
     bookingData: [],
     servicesData: [],
+    unavailableData: [],
     loading: true,
+    scrollDate: [],
   }
 
   componentDidMount(){
     this.didFocus = this.props.navigation.addListener('willFocus', () => {
-      this.setState({loading: true}, () => {
-        this.retrieveData();
-      })
+      if(!this.lastFromTime ){
+        this.queryCurrentMonth();
+      }
+      else{
+        this.retrieveData(this.lastFromTime, this.lastToTime);
+      }
     })
   }
 
@@ -53,8 +61,24 @@ class Home extends React.Component {
     this.didFocus.remove();
   }
 
+  queryCurrentMonth(){
+    let current = new Date();
+    let currentYear = current.getFullYear();
+    let currentMonth = current.getMonth();
+    let fromTime = new Date(currentYear, currentMonth);
+
+    if(currentMonth == 11){
+      let toTime = new Date(currentYear + 1, 0)
+    }
+    else{
+      toTime = new Date(currentYear, currentMonth + 1);
+    }
+
+    this.retrieveData(fromTime, toTime);
+  }
+
   scheduleDetail(index){
-    this.props.navigation.navigate("ScheduleDetails", {data: this.state.bookingData[index]});
+    this.props.navigation.navigate("ScheduleDetails", {data: this.state.bookingData[index]._id});
   }
 
   toggleDateStatus(marked, date){
@@ -69,15 +93,46 @@ class Home extends React.Component {
     this.setState({popUpDialog: true});
   }
 
-  dateStatusChoice(bool){
+  async dateStatusChoice(bool){
 
     if(bool){
+      let date = new Date(this.state.clickedDate);
+
+      let vendorId = await this.authAPI.retrieveVendorId();
+
+      if(!this.state.unavailableDate.includes(this.state.clickedDate)){
+
+        this.scheduleAPI.createUnavailableDate({date: date, vendorId: vendorId}, (res) => {
+          if(res == true){
+            Alert.alert('Successfully', "Date is updated successfully!",
+            [{text: 'OK'}])
+          }
+          this.queryCurrentMonth();
+        })
+
+      }
+      else{
+        let schedule = this.state.unavailableData.find(v => {return this.parseDate(new Date(v.date)) == this.state.clickedDate});
+
+        this.scheduleAPI.deleteUnavailableDate(schedule._id, (res) => {
+          if(res == true){
+            Alert.alert('Successfully', "Date is updated successfully!",
+            [{text: 'OK'}])
+          }
+        })
+
+      }
       this.calendarRef.current.updateDate(this.state.clickedDate);
     }
+
     this.setState({popUpDialog: false});
   }
 
-  async retrieveData(month){
+  async retrieveData(fromTime, toTime){
+    this.lastFromTime = fromTime;
+    this.lastToTime = toTime;
+    this.setState({loading: true});
+
     let vendorId = await this.authAPI.retrieveVendorId();
     let vendor = new VendorModel({_id: vendorId});
     
@@ -88,32 +143,48 @@ class Home extends React.Component {
         let unavailableDate = []
   
         unavailable.forEach(v => {
-          unavailableDate.push(v.date)
+          let time = new Date(v.date)
+          unavailableDate.push(this.parseDate(time))
         });
   
-        this.bookingAPI.getBookingByVendorId(vendorId, (bookings) => {
+        this.bookingAPI.getBookingByVendorFromTo(vendorId, fromTime, toTime, (bookings) => {
           let bookedDate = [];
-  
+          let scrollDate = [];
           bookings.forEach(v => {
             let time = new Date(v.time);
             v.time = time;
-            let month = time.getMonth() < 9 ? "0" + (time.getMonth() + 1) : (time.getMonth() + 1);
-            let date = time.getDate() < 9 ? "0" + (time.getDate() + 1) : (time.getDate() + 1);
-            let parsedDate = time.getFullYear() + "-" + month + "-" + date;
-            
-            if(!bookedDate.includes(parsedDate)){
+            let parsedDate = this.parseDate(time);            
+            if(!bookedDate.includes(parsedDate) && v.status != 'cancelled'){
               bookedDate.push(parsedDate);
             }
+
+            if(!scrollDate.includes(parsedDate)){
+              scrollDate.push(parsedDate)
+            }
+
           }) 
   
           //bookings.sort((a, b) => { return a.time - b.time});
-          this.setState({unavailableDate: unavailableDate, bookedDate: bookedDate, bookingData: bookings}, () => {
+          this.setState({
+            unavailableDate: unavailableDate, 
+            bookedDate: bookedDate, 
+            bookingData: bookings, 
+            unavailableData: unavailable, 
+            scrollDate: scrollDate
+          }, () => {
             this.calendarRef.current.processDate();
             this.setState({loading: false})
           })   
         })
       })
     })
+  }
+
+  parseDate(time){
+    let month = time.getMonth() < 9 ? "0" + (time.getMonth() + 1) : (time.getMonth() + 1);
+    let date = time.getDate() < 9 ? "0" + time.getDate() : time.getDate();
+    let parsedDate = time.getFullYear() + "-" + month + "-" + date;
+    return parsedDate;
   }
 
   renderTimeSchedule(index){
@@ -157,7 +228,7 @@ class Home extends React.Component {
             }}
           >
             <View style={styles.dayBackground}> 
-              <Text style={styles.day}>{lastDate.getDate() + 1}</Text>
+              <Text style={styles.day}>{lastDate.getDate()}</Text>
             </View>
 
             <View style={styles.month}>
@@ -186,13 +257,16 @@ class Home extends React.Component {
   scrollTo(day){
     let counter = 0;
 
-    for(var i = 0; i < this.state.bookedDate.length; i++){
-      if(day == this.state.bookedDate[i]){
+    for(var i = 0; i < this.state.scrollDate.length; i++){
+      if(day == this.state.scrollDate[i]){
         break;
       }
       counter += 1;
     }
-
+    
+    if(counter > this.state.scrollDate.length){
+      return;
+    }
     this.scrollview_ref.scrollTo({ x: 0, y: this.scrollPos[counter], animated: true })
   }
 
@@ -215,7 +289,7 @@ class Home extends React.Component {
             <ImageBackground source={require("../assets/imgs/Schedule1.png")} resizeMode='contain' style={styles.headerImage}/>
               <View style={{width: width, alignContent: 'center', alignItems: 'center', top: 15}}>
                 <Text color="#ffffff" size={40} style={{ marginLeft: 10, fontFamily: 'ITCKRIST'}}>
-                  Service Info
+                  Schedule
                 </Text>
               </View>
           </Block>
@@ -237,7 +311,7 @@ class Home extends React.Component {
             </Block>
 
             <Block flex={0.57} center style={styles.calendar}>
-              <Calendar ref={this.calendarRef} unavailableDate={this.state.unavailableDate} scrollTo={this.scrollTo}
+              <Calendar ref={this.calendarRef} unavailableDate={this.state.unavailableDate} scrollTo={this.scrollTo} monthChange={this.retrieveData}
                         bookedDate={this.state.bookedDate} markDate={this.state.clickedDate} toggleDateStatus={this.toggleDateStatus}/>
             </Block>
 
@@ -294,7 +368,9 @@ const styles = StyleSheet.create({
   },
   annotation: {
     paddingTop: 20,
-    marginBottom:0
+    marginBottom:0,
+    elevation: 5,
+    zIndex: 10
   },
   agenda: {
     width: "92%",
@@ -352,7 +428,8 @@ const styles = StyleSheet.create({
   },
   month:{
     position: 'absolute',
-    marginLeft: 22,
+    width: 70,
+    alignContent: 'center',
     alignSelf: 'flex-start',
     marginTop: 45
   },

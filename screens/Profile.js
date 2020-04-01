@@ -7,7 +7,9 @@ import {
   KeyboardAvoidingView,
   Picker,
   View,
-  ScrollView
+  ScrollView,
+  TouchableOpacity,
+  Alert
 } from "react-native";
 import { Block, Text, theme } from "galio-framework";
 import { argonTheme } from "../constants";
@@ -17,9 +19,8 @@ import Notification from '../models/NotificationModel';
 import ToggleSwitch from 'toggle-switch-react-native';
 import Popup from '../components/Popup';
 import AuthAPI from '../api/AuthAPI';
-import VendorModel from '../models/VendorModel';
-import VendorProfileAPI from '../api/VendorProfileAPI'
-import VendorAPI from '../api/VendorAPI'
+import VendorProfileAPI from '../api/VendorProfileAPI';
+import VendorAPI from '../api/VendorAPI';
 
 const { width, height } = Dimensions.get("screen");
 
@@ -30,7 +31,9 @@ class Profile extends React.Component {
     popUpDialog: false,
     name: "",
     email: "",
-    mobile: ""
+    store: "",
+    question: "",
+    popUpType: 0
   }
 
   constructor(props){
@@ -41,16 +44,17 @@ class Profile extends React.Component {
     this.authAPI = new AuthAPI();
     this.vendorProfileAPI = new VendorProfileAPI();
     this.vendorAPI = new VendorAPI();
+    this.vendor = new Object();
     this.retrieveData = this.retrieveData.bind(this); 
-    this.retrieveLocationData = this.retrieveData.bind(this);
-    this.saveAddress = null
+    this.handleUpdateInfo = this.handleUpdateInfo.bind(this);
+    this.clickUpdate = this.clickUpdate.bind(this);
+    this.handleChoice = this.handleChoice.bind(this);
+    this.validateInput = this.validateInput.bind(this);
   }
 
   componentDidMount(){
     this.didFocus = this.props.navigation.addListener('willFocus', () => {
-      this.setState({ loading: true }, () => {
-        this.retrieveData();
-      })
+      this.retrieveData();
     })
   }
 
@@ -62,48 +66,67 @@ class Profile extends React.Component {
     let vendorId = await this.authAPI.retrieveVendorId();
     
     this.vendorProfileAPI.getUserById(vendorId, (vendorProfile) => {
-      this.setState({name: vendorProfile.name, email: vendorProfile.email, mobile: vendorProfile.mobile})
-      let saveAddress = vendorProfile.address;
+      this.vendor = vendorProfile;
+      this.setState({name: vendorProfile.name, email: vendorProfile.email});
 
-      console.log(saveAddress);
-
-      this.vendorAPI.getVendorLocationById(saveAddress, (vendorLocation) => {
-        console.log(vendorLocation);
-        this.setState({address: vendorLocation.address});
-    })
+      this.vendorAPI.getVendorLocationById(vendorId, (vendorLocation) => {
+        this.setState({address: vendorLocation.address, store: vendorLocation.name});
+      })
     })
   }
 
-  register(){
-    let noti = new Notification({
-      content: "123",
-      time: "14:00",
-      vendor: {
-        name: 123,
-        $key: 111
-      }
-    })
-
-    noti.resolveData();
+  async logout(){
+    await this.authAPI.clearToken();
+    this.props.navigation.navigate('Account');
   }
 
-  async logout(bool){
+  clickLogout(){
+    this.setState({popUpDialog: true, question: 'Do you want to logout?', popUpType: 1})
+  }
+
+  clickUpdate(){
+    this.setState({popUpDialog: true, question: 'Do you want to update profile?', popUpType: 2})
+  }
+
+  handleUpdateInfo(){
+    if(!this.validateInput()){
+      return;
+    }
+    this.vendor.name = this.state.name;
+
+    this.vendorProfileAPI.updateUserById(this.vendor, (res) => {
+      Alert.alert('Successfully', "Your profile is updated successfully!",
+      [{text: 'OK'}]);
+      this.setState({edit: false})
+    })
+  }
+
+  validateInput(){
+    if(!this.state.email || !this.state.name){
+      Alert.alert('Error', "Input field can not be empty",
+      [{text: 'OK'}])
+      return false;
+    }
+    return true;
+  }
+
+  handleChoice(bool){
     this.setState({popUpDialog: false})
     if(bool){
-      await this.authAPI.clearToken();
-      this.props.navigation.navigate('Account');
+      if(this.state.popUpType == 2){
+        this.handleUpdateInfo();
+      }
+      else if(this.state.popUpType == 1){
+        this.logout();
+      }
     }
-  }
-
-  clickLogout(event){
-    this.setState({popUpDialog: true})
   }
 
   render() {
     const { navigation } = this.props;
 
     if(this.state.edit){
-      var updateInfo = <Button style={styles.loginButton} onPress={() => {this.register()}}>
+      var updateInfo = <Button style={styles.loginButton} onPress={this.clickUpdate}>
                           <Text bold size={16} color={argonTheme.COLORS.WHITE}>
                             Update Info
                           </Text>
@@ -120,7 +143,7 @@ class Profile extends React.Component {
           style={{ width, height, zIndex: 1 }}
         >
         
-        <Popup visible={this.state.popUpDialog} choice={this.logout} question={"Do you want to log out?"}/> 
+        <Popup visible={this.state.popUpDialog} choice={this.handleChoice} question={this.state.question}/> 
         <Block style={{position: 'absolute', top: 0}}>
             <ImageBackground source={require("../assets/imgs/Schedule1.png")} resizeMode='contain' style={styles.headerImage}/>
               <View style={{width: width, alignContent: 'center', alignItems: 'center', top: 15}}>
@@ -132,10 +155,10 @@ class Profile extends React.Component {
 
           <ScrollView style={{marginTop: 110}}>
             <Block flex={0.1} row style={styles.action} >
-              <View style={{alignContent:'flex-start', flex:1, flexDirection: 'row'}} onTouchStart={(event) => {this.clickLogout(event)}}>
+              <TouchableOpacity style={{alignContent:'flex-start', flex:1, flexDirection: 'row'}} onPress={this.clickLogout}>
                 <MaterialCommunityIcons name="logout-variant" size={30} style={styles.logoutIcon}></MaterialCommunityIcons>
                 <Text size={20} style={styles.logoutTxt}>Logout</Text>
-              </View>
+              </TouchableOpacity>
 
               <View style={{justifyContent:'flex-end', flex: 1, flexDirection: 'row'}}>
                 <ToggleSwitch
@@ -177,8 +200,7 @@ class Profile extends React.Component {
                   <Input
                     borderless 
                     placeholder="Email"
-                    editable={this.state.edit}
-                    onChangeText={(email) => {this.setState({email})}}
+                    editable={false}
                     value={this.state.email}
                     iconContent={
                       <Icon
@@ -189,27 +211,26 @@ class Profile extends React.Component {
                         style={styles.inputIcons}
                       />
                     }
-                    style={this.state.edit ? {backgroundColor: '#333333'}: {backgroundColor: '#1f1f1f'}}
+                    style={{backgroundColor: '#1f1f1f'}}
                   />
                 </Block>
 
                 <Block width={width * 0.9} style={{ marginBottom: 15 }}>
                   <Input
                     borderless 
-                    placeholder="Phone number"
-                    editable={this.state.edit}
-                    onChangeText={(phone) => {this.setState({phone})}}
-                    value={this.state.phone}
+                    placeholder="Store name"
+                    editable={false}
+                    value={this.state.store}
                     iconContent={
                       <MaterialIcons
                         size={16}
                         color={'#ffffff'}
-                        name="phone"
+                        name="store"
                         family="ArgonExtra"
                         style={styles.inputIcons}
                       />
                     }
-                    style={this.state.edit ? {backgroundColor: '#333333'}: {backgroundColor: '#1f1f1f'}}
+                    style={{backgroundColor: '#1f1f1f'}}
                   />
                 </Block>
 
@@ -217,8 +238,7 @@ class Profile extends React.Component {
                   <Input
                     borderless 
                     placeholder="Address"
-                    editable={this.state.edit}
-                    onChangeText={(address) => {this.setState({address})}}
+                    editable={false}
                     value={this.state.address}
                     iconContent={
                       <MaterialIcons
@@ -229,7 +249,7 @@ class Profile extends React.Component {
                         style={styles.inputIcons}
                       />
                     }
-                    style={this.state.edit ? {backgroundColor: '#333333'}: {backgroundColor: '#1f1f1f'}}
+                    style={{backgroundColor: '#1f1f1f'}}
                   />
                 </Block>
 

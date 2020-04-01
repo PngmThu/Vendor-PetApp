@@ -9,16 +9,15 @@ export default class ScheduleAPI{
         this.authAPI = new AuthAPI();
     }
 
-    createUnavailableDate(unavailableDate, callback){
+    async createUnavailableDate(unavailableDate, callback){
 
         const url = this.globals.serverHost + '/api/schedule/add';
-
+        const token = await this.authAPI.retrieveToken();
         let options = {
-            headers: {token: this.authAPI.retrieveToken(), 'Access-Control-Allow-Origin':'*'}
+            headers: {token: token, 'Access-Control-Allow-Origin':'*'}
         };
 
         let body = unavailableDate;
-
         axios.post(url, body, options)
         .then(res => {
             if(res.status == 200){
@@ -53,11 +52,12 @@ export default class ScheduleAPI{
         })
     }
 
-    deleteUnavailableDateById(id, callback){
-        const url = this.globals.serverHost + '/api/schedule/'+id;
+    async deleteUnavailableDate(id, callback){
+        const url = this.globals.serverHost + '/api/schedule/' + id;
+        const token = await this.authAPI.retrieveToken();
 
         let options = {
-            headers: {token: this.authAPI.retrievetoken(), 'Access-Control-Allow-Origin':'*'}
+            headers: {token: token, 'Access-Control-Allow-Origin':'*'}
         }
 
         axios.delete(url, options)

@@ -38,7 +38,7 @@ export default class NotificationAPI{
         let options = {
             headers: {'token':token, 'Access-Control-Allow-Origin':'*'}
         };
-        console.log(url)
+
         axios.get(url, options)
         .then(res=>{
             if (res.status==200){
@@ -50,4 +50,24 @@ export default class NotificationAPI{
         })
     }
 
+    async getNotificationByVendorFromTime(vendorId, fromTime, callback){
+
+        const url = this.globals.serverHost + '/api/notification/vendor/'+ vendorId + "/" + fromTime;
+        const token = await this.authAPI.retrieveToken();
+        
+        let options = {
+            headers: {'token':token, 'Access-Control-Allow-Origin':'*'}
+        };
+
+        axios.get(url, options)
+        .then(res=>{
+            if (res.status==200){
+                callback(res.data);
+            }
+        })
+        .catch(err=>{
+            console.log(err);
+            callback(false)
+        })
+    }
 }

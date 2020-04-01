@@ -7,14 +7,14 @@ import {
   KeyboardAvoidingView,
   Picker,
   View,
-  ScrollView
+  ScrollView,
+  Alert
 } from "react-native";
 import { Block, Text, theme } from "galio-framework";
 import { argonTheme } from "../constants";
 import { Button, Icon, Input } from "../components";
 import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
-import Notification from '../models/NotificationModel';
-import ToggleSwitch from 'toggle-switch-react-native';
+import VendorProfileAPI from '../api/VendorProfileAPI';
 import Popup from '../components/Popup';
 const { width, height } = Dimensions.get("screen");
 
@@ -26,22 +26,48 @@ class ChangePassword extends React.Component {
     rePwd: ""
   }
 
-  constructor(props){
+  constructor(props) {
     super(props);
     //console.log(this.props.navigation.state.params);
     this.clickSave = this.clickSave.bind(this);
     this.updatePwd = this.updatePwd.bind(this);
+    this.vendorProfileAPI = new VendorProfileAPI();
   }
 
-  updatePwd(bool){
-    if(bool){
-      console.log("Updated!");
+  async updatePwd(bool) {
+    if (bool) {
+      if (this.validatePwd()) {
+        let vendorId = await this.vendorProfileAPI.authAPI.retrieveVendorId();
+        this.vendorProfileAPI.updatePassword(vendorId, this.state.newPwd, async (res) => {
+          if (res == true) {
+            Alert.alert('Successful', "Password is updated succesfully!",
+              [{ text: 'OK' }]);
+            await this.vendorProfileAPI.authAPI.clearToken();
+            this.props.navigation.navigate('Account');
+          }
+        })
+      }
     }
-    this.setState({popUpDialog: false})
+    this.setState({ popUpDialog: false })
   }
 
-  clickSave(event){
-    this.setState({popUpDialog: true})
+  validatePwd() {
+    if (this.state.newPwd != this.state.rePwd) {
+      Alert.alert('Error', "New password not match",
+        [{ text: 'OK' }])
+      return false
+    }
+
+    if (!this.state.newPwd || !this.state.rePwd || !this.state.oldPwd) {
+      Alert.alert('Error', "Input field can not be empty",
+        [{ text: 'OK' }])
+      return false
+    }
+
+    return true;
+  }
+  clickSave(event) {
+    this.setState({ popUpDialog: true })
   }
 
   render() {
@@ -53,16 +79,16 @@ class ChangePassword extends React.Component {
           source={require("../assets/imgs/background2.gif")}
           style={{ width, height, zIndex: 1 }}
         >
-        
-        <Popup visible={this.state.popUpDialog} choice={this.updatePwd} question={"Do you want to update password?"}/> 
-        <Block flex={0.3} middle >
-          <ImageBackground source={require("../assets/imgs/headerPwd.png")} resizeMode='contain' style={styles.headerImage}/>
-          <MaterialIcons name='keyboard-backspace' size={40} style={styles.backBtn}
-                                  onPress={() => navigation.navigate("Profile")}/>
-          <Text color="#ffffff" size={33} style={{ marginLeft: 15, fontFamily: 'ITCKRIST', marginTop: 20}}>
-            Change Password
+
+          <Popup visible={this.state.popUpDialog} choice={this.updatePwd} question={"Do you want to update password?"} />
+          <Block flex={0.3} middle >
+            <ImageBackground source={require("../assets/imgs/headerPwd.png")} resizeMode='contain' style={styles.headerImage} />
+            <MaterialIcons name='keyboard-backspace' size={40} style={styles.backBtn}
+              onPress={() => navigation.navigate("Profile")} />
+            <Text color="#ffffff" size={33} style={{ marginLeft: 15, fontFamily: 'ITCKRIST', marginTop: 20 }}>
+              Change Password
           </Text>
-        </Block>
+          </Block>
 
           <ScrollView>
             <Block flex={0.5} center>
@@ -71,70 +97,70 @@ class ChangePassword extends React.Component {
                 behavior="padding"
                 enabled
               >
-                <Block width={width * 0.9} style={{marginTop: 120, marginBottom: 15 }}>
+                <Block width={width * 0.9} style={{ marginTop: 120, marginBottom: 15 }}>
                   <Input
                     borderless
                     password
                     viewPass
                     placeholder="Old password"
-                    onChangeText={(oldPwd) => {this.setState({oldPwd})}}
+                    onChangeText={(oldPwd) => { this.setState({ oldPwd }) }}
                     value={this.state.oldPwd}
-                    style={{backgroundColor: '#333333'}}
+                    style={{ backgroundColor: '#333333' }}
                     iconContent={
-                        <Icon
-                          size={16}
-                          color={'#5E5454'}
-                          name="padlock-unlocked"
-                          family="ArgonExtra"
-                          style={styles.inputIcons}
-                        />
-                      }
+                      <Icon
+                        size={16}
+                        color={'#5E5454'}
+                        name="padlock-unlocked"
+                        family="ArgonExtra"
+                        style={styles.inputIcons}
+                      />
+                    }
                   />
                 </Block>
                 <Block width={width * 0.9} style={{ marginBottom: 15 }}>
                   <Input
-                    borderless 
+                    borderless
                     password
                     viewPass
                     placeholder="New Password"
-                    onChangeText={(newPwd) => {this.setState({newPwd})}}
+                    onChangeText={(newPwd) => { this.setState({ newPwd }) }}
                     value={this.state.newPwd}
-                    style={{backgroundColor: '#333333'}}
+                    style={{ backgroundColor: '#333333' }}
                     iconContent={
-                        <Icon
-                          size={16}
-                          color={'#5E5454'}
-                          name="padlock-unlocked"
-                          family="ArgonExtra"
-                          style={styles.inputIcons}
-                        />
-                      }
+                      <Icon
+                        size={16}
+                        color={'#5E5454'}
+                        name="padlock-unlocked"
+                        family="ArgonExtra"
+                        style={styles.inputIcons}
+                      />
+                    }
                   />
                 </Block>
 
                 <Block width={width * 0.9} style={{ marginBottom: 15 }}>
                   <Input
-                    borderless 
+                    borderless
                     password
                     viewPass
                     placeholder="Re-enter new Password"
-                    onChangeText={(rePwd) => {this.setState({rePwd})}}
+                    onChangeText={(rePwd) => { this.setState({ rePwd }) }}
                     value={this.state.rePwd}
-                    style={{backgroundColor: '#333333'}}
+                    style={{ backgroundColor: '#333333' }}
                     iconContent={
-                        <Icon
-                          size={16}
-                          color={'#5E5454'}
-                          name="padlock-unlocked"
-                          family="ArgonExtra"
-                          style={styles.inputIcons}
-                        />
-                      }
+                      <Icon
+                        size={16}
+                        color={'#5E5454'}
+                        name="padlock-unlocked"
+                        family="ArgonExtra"
+                        style={styles.inputIcons}
+                      />
+                    }
                   />
                 </Block>
 
-                <Block flex={0.1} middle style={{marginBottom: height * 0.1}}>
-                  <Button style={styles.passwordBtn} onPress={() => {this.clickSave()}}>
+                <Block flex={0.1} middle style={{ marginBottom: height * 0.1 }}>
+                  <Button style={styles.passwordBtn} onPress={() => { this.clickSave() }}>
                     <Text bold size={16} color={argonTheme.COLORS.WHITE}>
                       Save
                     </Text>
@@ -151,13 +177,13 @@ class ChangePassword extends React.Component {
 
 const styles = StyleSheet.create({
   home: {
-    width: width,    
+    width: width,
     paddingBottom: 20
   },
   headerImage: {
     width: width,
     height: height,
-    justifyContent:'flex-start',
+    justifyContent: 'flex-start',
     borderRadius: 4,
     position: 'absolute',
     marginTop: -80
@@ -185,12 +211,13 @@ const styles = StyleSheet.create({
     marginTop: 15
   },
   backBtn: {
-    position: 'absolute', 
+    position: 'absolute',
     marginTop: 100,
-    paddingTop: 20, 
+    paddingTop: 20,
     marginLeft: 18,
     alignSelf: 'flex-start',
-    color: 'white'}
+    color: 'white'
+  }
 });
 
 export default ChangePassword;

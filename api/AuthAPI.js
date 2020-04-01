@@ -122,5 +122,6 @@ export default class AuthAPI{
 
     async clearToken(){
         await AsyncStorage.removeItem('token');
+        await AsyncStorage.removeItem('id');
     }
 }

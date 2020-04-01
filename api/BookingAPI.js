@@ -39,7 +39,7 @@ export default class BookingAPI{
         let options = {
             headers: {token: token, 'Access-Control-Allow-Origin':'*'}
         }
-
+        console.log(bookingId)
         axios.get(url,options)
         .then(res => {
             if(res.status == 200){
@@ -47,12 +47,33 @@ export default class BookingAPI{
             }
         })
         .catch(err => {
+            callback(false);
             console.log(err.response.data);
         })
     }
 
     async getBookingByVendorId(vendorId, callback){
         const url = this.globals.serverHost + '/api/booking/vendor/' + vendorId;
+        const token = await this.authAPI.retrieveToken();
+        
+        let options = {
+            headers: {token: token, 'Access-Control-Allow-Origin':'*'},
+        }
+
+        axios.get(url, options)
+        .then(res => {
+            if(res.status == 200){
+                callback(res.data);
+            }
+        })
+        .catch(err => {
+            console.log(err)
+            console.log(err.response.data);
+        })
+    }
+
+    async getBookingByVendorFromTo(vendorId, fromTime, toTime, callback){
+        const url = this.globals.serverHost + '/api/booking/vendor/time/' + vendorId + '/' + fromTime + '/' + toTime;
         const token = await this.authAPI.retrieveToken();
         
         let options = {
