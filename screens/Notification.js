@@ -139,7 +139,7 @@ class Notification extends React.Component {
     return (
       <Block flex center style={styles.home}>
         <ImageBackground
-          source={require("../assets/imgs/background2.gif")}
+          source={require("../assets/imgs/galaxy_bg.jpg")}
           style={{ width, height, zIndex: 1 }}
         >
 
@@ -207,7 +207,7 @@ const styles = StyleSheet.create({
   agenda: {
     width: "90%",
     borderRadius: 15,
-    backgroundColor: 'rgba(45, 45, 45, 0.8)',
+    backgroundColor: 'rgba(45, 45, 45, 0.6)',
     height: 100,
     paddingLeft: 20,
     paddingRight: 20,

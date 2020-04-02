@@ -280,7 +280,7 @@ class Home extends React.Component {
     return (
       <Block flex center style={styles.home}>
         <ImageBackground
-          source={require("../assets/imgs/background2.gif")}
+          source={require("../assets/imgs/galaxy_bg.jpg")}
           style={{ width, height, zIndex: 1 }}
         >
           {loader}
@@ -381,7 +381,7 @@ const styles = StyleSheet.create({
     width: "80%",
     borderRadius: 12,
     alignSelf: 'flex-end',
-    backgroundColor: 'rgba(45, 45, 45, 0.8)',
+    backgroundColor: 'rgba(45, 45, 45, 0.6)',
     height: 60,
     paddingLeft: 20,
     paddingRight: 20,
