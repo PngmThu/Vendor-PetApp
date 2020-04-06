@@ -31,7 +31,7 @@ export default class VendorProfileAPI{
         })
     }
 
-    async updatePassword(vendorId, password, callback){
+    async updatePassword(vendorId, newPwd, oldPwd, callback){
         const token = await this.authAPI.retrieveToken();
 
         const url = this.globals.serverHost + '/api/vendor/password/' + vendorId;
@@ -40,7 +40,7 @@ export default class VendorProfileAPI{
             headers: {token: token, 'Access-Control-Allow-Origin':'*'}
         };
 
-        let body = {password: password};
+        let body = {password: newPwd, oldPwd: oldPwd};
 
         axios.put(url, body, options)
         .then(res => {
@@ -52,7 +52,7 @@ export default class VendorProfileAPI{
             }
         })
         .catch(err => {
-            callback(false);
+            callback(err.response.data);
             console.log(err.response.data)
         })
 

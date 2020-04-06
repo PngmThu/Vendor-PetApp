@@ -6,14 +6,16 @@ import {
   StatusBar,
   KeyboardAvoidingView,
   Image,
-  View,
+  Keyboard,
   Alert
 } from "react-native";
 import { Block, Checkbox, Text, theme } from "galio-framework";
 
-import { Button, 
-  Icon, 
-  Input } from "../components";
+import {
+  Button,
+  Icon,
+  Input
+} from "../components";
 import { Images, argonTheme } from "../constants";
 import { TouchableOpacity, ScrollView } from "react-native-gesture-handler";
 
@@ -29,38 +31,55 @@ class Login extends React.Component {
     email: "",
     password: "",
     loading: false,
+    keyboardHeight: 0
   }
 
-  constructor(props){
+  constructor(props) {
     super(props);
     this.authAPI = new AuthAPI();
     this.login = this.login.bind(this);
+    this._keyboardDidShow = this._keyboardDidShow.bind(this);
   }
 
-  login(){
-    this.setState({loading: true})
+  componentDidMount() {
+    this.keyboardDidShowListener = Keyboard.addListener(
+      'keyboardDidShow',
+      this._keyboardDidShow,
+    );
+  }
+
+  componentWillUnmount() {
+    this.keyboardDidShowListener.remove();
+  }
+  
+  _keyboardDidShow(e) {
+    this.setState({ keyboardHeight: e.endCoordinates.height });
+  }
+
+  login() {
+    this.setState({ loading: true })
     this.authAPI.login(this.state.email, this.state.password, (res) => {
-      this.setState({loading: false})
-      if(res == true){
+      this.setState({ loading: false })
+      if (res == true) {
         this.props.navigation.navigate('Home')
       }
-      else{
+      else {
         Alert.alert('Error', res,
-          [{text: 'Ok'}])
+          [{ text: 'Ok' }])
       }
     })
   }
 
   render() {
     const { navigation } = this.props;
-    if(this.state.loading){
+    if (this.state.loading) {
       var loader = <Loader />
     }
     return (
       // <Block flex middle> 
       <Block flex middle >
         {/* <StatusBar hidden /> */}
-        
+
         <ImageBackground
           // source={Images.GalaxyBackground} //Images.RegisterBackground
           source={require("../assets/imgs/galaxy_bg.jpg")}
@@ -68,32 +87,34 @@ class Login extends React.Component {
         >
           {loader}
           <Block flex={0.62} middle>
-          {/* <Block flex={1} top={true} style={{justifyContent:'flex-start'}}> */}
+            {/* <Block flex={1} top={true} style={{justifyContent:'flex-start'}}> */}
             <ImageBackground source={headerImg} resizeMode='contain' style={styles.headerImage}>
               <Block flex middle>
-                <Image source={Images.petsImg} resizeMode='contain' style={{marginTop: -50, width: '80%', height: '80%'}}/>
+                <Image source={Images.petsImg} resizeMode='contain' style={{ marginTop: -50, width: '80%', height: '80%' }} />
               </Block>
-            </ImageBackground> 
+            </ImageBackground>
           </Block>
 
           <Block flex>
             <Block flex={0.15}>
-              <Text color="#E1E1E1" size={32} style={{ marginLeft: 15, fontWeight: 'bold'}}>
+              <Text color="#E1E1E1" size={32} style={{ marginLeft: 15, fontWeight: 'bold' }}>
                 Welcome to PetWorld
               </Text>
             </Block>
-            
+
             <Block flex={0.85} center>
               <KeyboardAvoidingView
-                  behavior="padding" 
-                  keyboardVerticalOffset={100}
+                style={{ flex: 1 }}
+                behavior="padding"
+                keyboardVerticalOffset={this.state.keyboardHeight}
+                enabled
               >
-                  <ScrollView style={{paddingBottom: 50}}>
+                <ScrollView>
                   <Block width={width * 0.9} style={{ marginBottom: 15 }}>
                     <Input
-                      borderless 
+                      borderless
                       placeholder="Email"
-                      onChangeText={(email) => {this.setState({email})}}
+                      onChangeText={(email) => { this.setState({ email }) }}
                       value={this.state.email}
                       iconContent={
                         <Icon
@@ -104,7 +125,7 @@ class Login extends React.Component {
                           style={styles.inputIcons}
                         />
                       }
-                      style={{backgroundColor: '#333333'}}
+                      style={{ backgroundColor: '#333333' }}
                     />
                   </Block>
                   <Block width={width * 0.9}>
@@ -113,7 +134,7 @@ class Login extends React.Component {
                       viewPass
                       borderless
                       placeholder="Password"
-                      onChangeText={(password) => {this.setState({password})}}
+                      onChangeText={(password) => { this.setState({ password }) }}
                       value={this.state.password}
                       iconContent={
                         <Icon
@@ -125,15 +146,15 @@ class Login extends React.Component {
                           style={styles.inputIcons}
                         />
                       }
-                      style={{backgroundColor: '#333333'}}
-                    /> 
+                      style={{ backgroundColor: '#333333' }}
+                    />
                     <TouchableOpacity onPress={() => navigation.navigate("ForgetPassword")}>
-                      <Text style={{color: argonTheme.COLORS.PRIMARY,fontSize: 14,textAlign: 'right'}}>
+                      <Text style={{ color: argonTheme.COLORS.PRIMARY, fontSize: 14, textAlign: 'right' }}>
                         Forget Password?
                       </Text>
                     </TouchableOpacity>
 
-                  </Block> 
+                  </Block>
                   <Block flex middle>
                     <Button color="primary" style={styles.loginButton} onPress={this.login}>
                       <Text bold size={14} color={argonTheme.COLORS.WHITE}>
@@ -142,21 +163,21 @@ class Login extends React.Component {
                     </Button>
                   </Block>
 
-                <Block row flex center style={{marginBottom: height * 0.05, marginTop: 30}}>
-                  <Text size={14} color={argonTheme.COLORS.WHITE}>Don't have an account?</Text>
-                  <TouchableOpacity onPress={() => navigation.navigate("Register")}>
-                    <Text style={{color: argonTheme.COLORS.PRIMARY, fontSize: 14}}>
-                      {"  "}Register now
+                  <Block row flex center style={{ marginBottom: height * 0.05, marginTop: 30 }}>
+                    <Text size={14} color={argonTheme.COLORS.WHITE}>Don't have an account?</Text>
+                    <TouchableOpacity onPress={() => navigation.navigate("Register")}>
+                      <Text style={{ color: argonTheme.COLORS.PRIMARY, fontSize: 14 }}>
+                        {"  "}Register now
                     </Text>
-                  </TouchableOpacity>
-                </Block>
+                    </TouchableOpacity>
+                  </Block>
                 </ScrollView>
               </KeyboardAvoidingView>
             </Block>
           </Block>
 
         </ImageBackground>
-      </Block>  
+      </Block>
     );
   }
 }
@@ -170,7 +191,7 @@ const styles = StyleSheet.create({
     height: height,
     //marginTop: -10,
     //scaleX: 1.2,
-    justifyContent:'flex-start',
+    justifyContent: 'flex-start',
     borderRadius: 4,
     //elevation: 1,
     //overflow: "hidden"

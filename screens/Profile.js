@@ -5,7 +5,7 @@ import {
   Dimensions,
   StatusBar,
   KeyboardAvoidingView,
-  Picker,
+  Keyboard,
   View,
   ScrollView,
   TouchableOpacity,
@@ -33,7 +33,8 @@ class Profile extends React.Component {
     email: "",
     store: "",
     question: "",
-    popUpType: 0
+    popUpType: 0,
+    keyboardHeight: 0
   }
 
   constructor(props){
@@ -50,16 +51,26 @@ class Profile extends React.Component {
     this.clickUpdate = this.clickUpdate.bind(this);
     this.handleChoice = this.handleChoice.bind(this);
     this.validateInput = this.validateInput.bind(this);
+    this._keyboardDidShow = this._keyboardDidShow.bind(this);
   }
 
   componentDidMount(){
     this.didFocus = this.props.navigation.addListener('willFocus', () => {
       this.retrieveData();
-    })
+    });
+    this.keyboardDidShowListener = Keyboard.addListener(
+      'keyboardDidShow',
+      this._keyboardDidShow,
+    );
   }
 
   componentWillUnmount(){
     this.didFocus.remove();
+    this.keyboardDidShowListener.remove();
+  }
+
+  _keyboardDidShow(e){
+    this.setState({keyboardHeight: e.endCoordinates.height});
   }
 
   async retrieveData(){
@@ -175,6 +186,7 @@ class Profile extends React.Component {
               <KeyboardAvoidingView
                 style={{ flex: 1 }}
                 behavior="padding"
+                keyboardVerticalOffset={this.state.keyboardHeight}
                 enabled
               >
                 <Block width={width * 0.9} style={{marginTop: 20, marginBottom: 15 }}>

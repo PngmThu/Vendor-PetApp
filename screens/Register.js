@@ -8,12 +8,15 @@ import {
   Picker,
   View,
   Text,
-  Alert
+  Alert,
+  Keyboard
 } from "react-native";
 import { Block, Checkbox, theme } from "galio-framework";
-import { Button, 
-  Icon, 
-  Input, Select } from "../components";
+import {
+  Button,
+  Icon,
+  Input, Select
+} from "../components";
 import { Images, argonTheme } from "../constants";
 import VendorAPI from '../api/VendorAPI';
 import { MaterialIcons } from '@expo/vector-icons';
@@ -23,22 +26,33 @@ const { width, height } = Dimensions.get("screen");
 const headerImg = require("../assets/imgs/headerLogin.png");
 
 class Register extends React.Component {
-  
-  constructor(props){
+
+  constructor(props) {
     super(props);
     this.handleRegister = this.handleRegister.bind(this);
     this.retrieveData = this.retrieveData.bind(this);
     this.renderPicker = this.renderPicker.bind(this);
     this.renderPickerItem = this.renderPickerItem.bind(this);
     this.vendorAPI = new VendorAPI();
+    this._keyboardDidShow = this._keyboardDidShow.bind(this);
   }
 
-  componentDidMount(){
+  componentDidMount() {
     this.didFocus = this.props.navigation.addListener('willFocus', () => {
-      this.setState({loading: true}, () => {
+      this.setState({ loading: true }, () => {
         this.retrieveData();
       })
-    })
+    });
+
+    this.keyboardDidShowListener = Keyboard.addListener(
+      'keyboardDidShow',
+      this._keyboardDidShow,
+    );
+  }
+
+  componentWillUnmount () {
+    this.didFocus.remove();
+    this.keyboardDidShowListener.remove();
   }
 
   state = {
@@ -49,24 +63,29 @@ class Register extends React.Component {
     rePassword: "",
     vendorLocations: [],
     location: "",
-    loading: true
+    loading: true,
+    keyboardHeight: 0
   }
 
-  retrieveData(){
+  _keyboardDidShow(e){
+    this.setState({keyboardHeight: e.endCoordinates.height});
+  }
+
+  retrieveData() {
     this.vendorAPI.getVendorLocation(res => {
-      this.setState({vendorLocations: res, loading: false})
+      this.setState({ vendorLocations: res, loading: false })
     })
   }
 
-  handleRegister(){
-    if(!this.state.email || !this.state.name || !this.state.address || !this.state.password){
+  handleRegister() {
+    if (!this.state.email || !this.state.name || !this.state.address || !this.state.password) {
       Alert.alert('Error', "Input field can not be empty",
-      [{text: 'Ok'}])
+        [{ text: 'Ok' }])
       return;
     }
-    else if(this.state.password != this.state.rePassword){
+    else if (this.state.password != this.state.rePassword) {
       Alert.alert('Error', "Password field not match",
-      [{text: 'Ok'}]);
+        [{ text: 'Ok' }]);
       return;
     }
     this.vendor = new Object({
@@ -78,21 +97,21 @@ class Register extends React.Component {
     });
 
     this.vendorAPI.createVendor(this.vendor, (res) => {
-      if(res == true){
+      if (res == true) {
         Alert.alert('Succesfully', 'User is created successfully! You can log in now',
-          [{text: 'Ok' , onPress: () => this.props.navigation.navigate('Login')}]
+          [{ text: 'Ok', onPress: () => this.props.navigation.navigate('Login') }]
         );
       }
-      else{
+      else {
         Alert.alert('Error', res,
-        [{text: 'Ok'}]);
+          [{ text: 'Ok' }]);
       }
     })
   }
 
-  renderPickerItem(){
-    let table  = []
-    for(var i = 0; i < this.state.vendorLocations.length; i ++){
+  renderPickerItem() {
+    let table = []
+    for (var i = 0; i < this.state.vendorLocations.length; i++) {
       table.push(
         <Picker.Item key={i} label={this.state.vendorLocations[i].name} value={this.state.vendorLocations[i]._id} />
       )
@@ -100,8 +119,8 @@ class Register extends React.Component {
     return table;
   }
 
-  renderPicker(){
-    return(
+  renderPicker() {
+    return (
       <Picker
         selectedValue={this.state.address}
         style={{
@@ -109,35 +128,34 @@ class Register extends React.Component {
           paddingBottom: 0,
           backgroundColor: 'transparent',
           paddingLeft: 0,
-          transform: [{scaleX: 0.77}, {scaleY: 0.77}],
+          transform: [{ scaleX: 0.77 }, { scaleY: 0.77 }],
           position: 'absolute',
           color: "#cccccc"
         }}
         itemStyle={{
-          backgroundColor:"#000000"
+          backgroundColor: "#000000"
         }}
-        onValueChange={(itemValue, itemIndex) =>
-          {
-            var item = this.state.vendorLocations.find(v => {return v._id == itemValue});
-            this.setState({address: itemValue, location: item ? item.address : ""});
-          }
-          
-      }>
+        onValueChange={(itemValue, itemIndex) => {
+          var item = this.state.vendorLocations.find(v => { return v._id == itemValue });
+          this.setState({ address: itemValue, location: item ? item.address : "" });
+        }
+
+        }>
         <Picker.Item label="Store" value="" />
-        { this.renderPickerItem()}
+        {this.renderPickerItem()}
       </Picker>
     )
 
   }
-  
+
   render() {
     const { navigation } = this.props;
-    if(this.state.loading){
+    if (this.state.loading) {
       var loader = <Loader />
     }
     return (
       <Block flex middle >
-        
+
         <ImageBackground
           source={require("../assets/imgs/galaxy_bg.jpg")}
           style={{ width, height, zIndex: 1 }}
@@ -145,139 +163,139 @@ class Register extends React.Component {
           {loader}
           <Block flex={0.3} middle>
             <ImageBackground source={require("../assets/imgs/headerRegister.png")} resizeMode='contain' style={styles.headerImage}>
-                <Block flex middle>
-                    <MaterialIcons name='keyboard-backspace' size={40} style={{left: -170, top: -35, color:'white'}}
-                                  onPress={() => navigation.navigate('Login')}/>
-                </Block>
-            </ImageBackground> 
+              <Block flex middle>
+                <MaterialIcons name='keyboard-backspace' size={40} style={{ left: -170, top: -35, color: 'white' }}
+                  onPress={() => navigation.navigate('Login')} />
+              </Block>
+            </ImageBackground>
           </Block>
 
           <Block flex={0.7}>
             <Block flex={0.1}>
-              <Text style={{ marginLeft: 15, fontSize: 32, fontWeight: 'bold', color:'white'}}>
+              <Text style={{ marginLeft: 15, fontSize: 32, fontWeight: 'bold', color: 'white' }}>
                 Create an account
               </Text>
             </Block>
 
-            <Block flex={0.9} center style={{paddingBottom: 50}}>
-                <KeyboardAvoidingView behavior="padding" keyboardVerticalOffset={300}>
-                  <ScrollView>
-                    <Block width={width * 0.9} style={{marginTop: 20, marginBottom: 15 }}>
-                      <Input
-                        borderless
-                        placeholder="Your name"
-                        onChangeText={(name) => {this.setState({name})}}
-                        value={this.state.name}
-                        iconContent={
-                          <Icon
-                            size={16}
-                            color={'white'}
-                            name="hat-3"
-                            family="ArgonExtra"
-                            style={styles.inputIcons}
-                          />
-                        }
-                        style={{backgroundColor: '#333333'}}
-                      />
-                    </Block>
-                    <Block width={width * 0.9} style={{ marginBottom: 15 }}>
-                      <Input
-                        borderless 
-                        placeholder="Email"
-                        onChangeText={(email) => {this.setState({email})}}
-                        value={this.state.email}
-                        iconContent={
-                          <Icon
-                            size={16}
-                            color={'white'}
-                            name="ic_mail_24px"
-                            family="ArgonExtra"
-                            style={styles.inputIcons}
-                          />
-                        }
-                        style={{backgroundColor: '#333333'}}
-                      />
-                    </Block>
+            <ScrollView style={{flex: 0.9}}>
+              <Block center>
+                <KeyboardAvoidingView behavior="padding" keyboardVerticalOffset={this.state.keyboardHeight}>
+                  <Block width={width * 0.9} style={{ marginTop: 30, marginBottom: 15 }}>
+                    <Input
+                      borderless
+                      placeholder="Your name"
+                      onChangeText={(name) => { this.setState({ name }) }}
+                      value={this.state.name}
+                      iconContent={
+                        <Icon
+                          size={16}
+                          color={'white'}
+                          name="hat-3"
+                          family="ArgonExtra"
+                          style={styles.inputIcons}
+                        />
+                      }
+                      style={{ backgroundColor: '#333333' }}
+                    />
+                  </Block>
+                  <Block width={width * 0.9} style={{ marginBottom: 15 }}>
+                    <Input
+                      borderless
+                      placeholder="Email"
+                      onChangeText={(email) => { this.setState({ email }) }}
+                      value={this.state.email}
+                      iconContent={
+                        <Icon
+                          size={16}
+                          color={'white'}
+                          name="ic_mail_24px"
+                          family="ArgonExtra"
+                          style={styles.inputIcons}
+                        />
+                      }
+                      style={{ backgroundColor: '#333333' }}
+                    />
+                  </Block>
 
-                    <Block width={width * 0.9} style={{ marginBottom: 10 }}>
+                  <Block width={width * 0.9} style={{ marginBottom: 10 }}>
+                    <View
+                      style={{
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        backgroundColor: '#333333',
+                        borderRadius: 9
+                      }}>
                       <View
                         style={{
+                          width: '100%',
                           flexDirection: 'row',
+                          flex: 1,
+                          position: 'relative',
                           alignItems: 'center',
-                          backgroundColor: '#333333',
-                          borderRadius: 9
+                          height: 44,
+                          paddingLeft: 15
                         }}>
-                        <View
-                          style={{
-                            width: '100%',
-                            flexDirection: 'row',
-                            flex: 1,
-                            position: 'relative',
-                            alignItems: 'center',
-                            height: 44,
-                            paddingLeft: 15
-                          }}>
-                          <MaterialIcons name="location-on" size={16} color="white" style={{marginRight: 10}} />
-                            {this.renderPicker()}
-                        </View>
+                        <MaterialIcons name="location-on" size={16} color="white" style={{ marginRight: 10 }} />
+                        {this.renderPicker()}
                       </View>
-                      <Text style={{fontSize: 12, color: 'white', marginTop: 5, marginLeft: 20}}>{"Location: " + this.state.location}</Text>
-                    </Block>
+                    </View>
+                    <Text style={{ fontSize: 12, color: 'white', marginTop: 5, marginLeft: 20 }}>{"Location: " + this.state.location}</Text>
+                  </Block>
 
-                    <Block width={width * 0.9} style={{ marginBottom: 15 }}>
-                      <Input
-                        password
-                        viewPass
-                        borderless
-                        placeholder="Password"
-                        onChangeText={(password) => {this.setState({password})}}
-                        value={this.state.password}
-                        iconContent={
-                          <Icon
-                            size={16}
-                            color={'white'}
-                            name="padlock-unlocked"
-                            family="ArgonExtra"
-                            style={styles.inputIcons}
-                          />
-                        }
-                        style={{backgroundColor: '#333333'}}
-                      />                 
-                    </Block> 
-                    <Block width={width * 0.9} style={{ marginBottom: 15 }}>
-                      <Input
-                        password
-                        viewPass
-                        borderless
-                        placeholder="Re-enter password"
-                        onChangeText={(rePassword) => {this.setState({rePassword})}}
-                        value={this.state.rePassword}
-                        iconContent={
-                          <Icon
-                            size={16}
-                            color={'white'}
-                            name="padlock-unlocked"
-                            family="ArgonExtra"
-                            style={styles.inputIcons}
-                          />
-                        }
-                        style={{backgroundColor: '#333333'}}
-                      />            
-                    </Block>
+                  <Block width={width * 0.9} style={{ marginBottom: 15 }}>
+                    <Input
+                      password
+                      viewPass
+                      borderless
+                      placeholder="Password"
+                      onChangeText={(password) => { this.setState({ password }) }}
+                      value={this.state.password}
+                      iconContent={
+                        <Icon
+                          size={16}
+                          color={'white'}
+                          name="padlock-unlocked"
+                          family="ArgonExtra"
+                          style={styles.inputIcons}
+                        />
+                      }
+                      style={{ backgroundColor: '#333333' }}
+                    />
+                  </Block>
+                  <Block width={width * 0.9} style={{ marginBottom: 15 }}>
+                    <Input
+                      password
+                      viewPass
+                      borderless
+                      placeholder="Re-enter password"
+                      onChangeText={(rePassword) => { this.setState({ rePassword }) }}
+                      value={this.state.rePassword}
+                      iconContent={
+                        <Icon
+                          size={16}
+                          color={'white'}
+                          name="padlock-unlocked"
+                          family="ArgonExtra"
+                          style={styles.inputIcons}
+                        />
+                      }
+                      style={{ backgroundColor: '#333333' }}
+                    />
+                  </Block>
 
-                    <Block middle style={{marginBottom: 20}}>
-                      <Button color="primary" style={styles.loginButton} onPress={this.handleRegister}>
-                        <Text bold size={14} color={'white'} style={{color: 'white'}}>
-                          Register
+                  <Block middle style={{ marginBottom: 20 }}>
+                    <Button color="primary" style={styles.loginButton} onPress={this.handleRegister}>
+                      <Text bold size={14} color={'white'} style={{ color: 'white' }}>
+                        Register
                         </Text>
-                      </Button>
-                    </Block>
-                  </ScrollView>
+                    </Button>
+                  </Block>
                 </KeyboardAvoidingView>
-            </Block>
+              </Block>
+            </ScrollView>
           </Block>
         </ImageBackground>
-      </Block>  
+      </Block>
     );
   }
 }
@@ -291,7 +309,7 @@ const styles = StyleSheet.create({
     height: height,
     //marginTop: -10,
     //scaleX: 1.2,
-    justifyContent:'flex-start',
+    justifyContent: 'flex-start',
     borderRadius: 4,
     //elevation: 1,
     //overflow: "hidden"

@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "Argon FREE React Native",
-    "slug": "argon-free-react-native",
+    "name": "PetWorld Vendor App",
+    "slug": "petworld-vendor-app",
     "privacy": "public",
     "sdkVersion": "35.0.0",
     "platforms": [
@@ -10,7 +10,7 @@
     ],
     "version": "1.3.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/imgs/logo1.png",
     "splash": {
       "image": "./assets/imgs/loading.png",
       "resizeMode": "cover",
@@ -28,6 +28,7 @@
     "android": {
       "googleServicesFile": "./google-services.json",
       "package": "com.petapp"
-    }
+    },
+    "description": "An app for vendor to manage and provide services to pet owners"
   }
 }

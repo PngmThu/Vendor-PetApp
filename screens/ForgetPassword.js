@@ -74,7 +74,6 @@ class ResetPassword extends React.Component {
           <KeyboardAvoidingView
                 style={{ flex: 1 }}
                 behavior="padding"
-                keyboardVerticalOffset={0}
               >
             <Block flex middle>
               <Image source={require("../assets/imgs/sendEmail.png")} resizeMode='contain' 

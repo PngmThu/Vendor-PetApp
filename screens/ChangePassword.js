@@ -5,7 +5,7 @@ import {
   Dimensions,
   StatusBar,
   KeyboardAvoidingView,
-  Picker,
+  Keyboard,
   View,
   ScrollView,
   Alert
@@ -23,7 +23,8 @@ class ChangePassword extends React.Component {
     popUpDialog: false,
     oldPwd: "",
     newPwd: "",
-    rePwd: ""
+    rePwd: "",
+    keyboardHeight: 0
   }
 
   constructor(props) {
@@ -32,23 +33,42 @@ class ChangePassword extends React.Component {
     this.clickSave = this.clickSave.bind(this);
     this.updatePwd = this.updatePwd.bind(this);
     this.vendorProfileAPI = new VendorProfileAPI();
+    this._keyboardDidShow = this._keyboardDidShow.bind(this);
   }
 
   async updatePwd(bool) {
     if (bool) {
       if (this.validatePwd()) {
         let vendorId = await this.vendorProfileAPI.authAPI.retrieveVendorId();
-        this.vendorProfileAPI.updatePassword(vendorId, this.state.newPwd, async (res) => {
+        this.vendorProfileAPI.updatePassword(vendorId, this.state.newPwd, this.state.oldPwd, async (res) => {
           if (res == true) {
             Alert.alert('Successful', "Password is updated succesfully!",
               [{ text: 'OK' }]);
             await this.vendorProfileAPI.authAPI.clearToken();
             this.props.navigation.navigate('Account');
           }
+          else {
+            Alert.alert('Error', res,
+              [{ text: 'OK' }]);
+          }
         })
       }
     }
     this.setState({ popUpDialog: false })
+  }
+  componentDidMount() {
+    this.keyboardDidShowListener = Keyboard.addListener(
+      'keyboardDidShow',
+      this._keyboardDidShow,
+    );
+  }
+
+  componentWillUnmount() {
+    this.keyboardDidShowListener.remove();
+  }
+
+  _keyboardDidShow(e) {
+    this.setState({ keyboardHeight: e.endCoordinates.height });
   }
 
   validatePwd() {
@@ -95,6 +115,7 @@ class ChangePassword extends React.Component {
               <KeyboardAvoidingView
                 style={{ flex: 1 }}
                 behavior="padding"
+                keyboardVerticalOffset={this.state.keyboardHeight}
                 enabled
               >
                 <Block width={width * 0.9} style={{ marginTop: 120, marginBottom: 15 }}>

@@ -11,7 +11,8 @@ import {
   TextInput,
   SafeAreaView,
   Alert,
-  Image
+  Image,
+  Keyboard
 } from "react-native";
 import { Block, Text, theme } from "galio-framework";
 import { argonTheme } from "../constants";
@@ -32,6 +33,7 @@ class ServiceInput extends React.Component {
     description: "",
     createNew: false,
     obj: null,
+    keyboardHeight: 0
   }
 
   constructor(props){
@@ -41,16 +43,27 @@ class ServiceInput extends React.Component {
     this.confirm = this.confirm.bind(this);
     this.validateInput = this.validateInput.bind(this);
     this.serviceAPI = new ServiceAPI();
+    this._keyboardDidShow = this._keyboardDidShow.bind(this);
   }
 
   componentDidMount(){
     this.focusListener = this.props.navigation.addListener('didFocus', () => {
       this.getPropData()
-    })
+    });
+
+    this.keyboardDidShowListener = Keyboard.addListener(
+      'keyboardDidShow',
+      this._keyboardDidShow,
+    );
   }
 
   componentWillUnmount () {
-    this.focusListener.remove()
+    this.focusListener.remove();
+    this.keyboardDidShowListener.remove();
+  }
+
+  _keyboardDidShow(e){
+    this.setState({keyboardHeight: e.endCoordinates.height});
   }
 
   getPropData(){
@@ -184,7 +197,7 @@ class ServiceInput extends React.Component {
                 <KeyboardAvoidingView
                   style={{ flex: 1 }}
                   behavior="padding"
-                  keyboardVerticalOffset={300}
+                  keyboardVerticalOffset={this.state.keyboardHeight}
                   enabled
                 >
                 <Block flex middle>
