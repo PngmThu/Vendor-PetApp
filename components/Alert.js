@@ -6,18 +6,11 @@ class Alert extends React.Component{
     constructor(props){
         super(props);
     }
-
-    renderBtn(){
-        var table = []
-        table.push(
-            <DialogButton
-            text="Dismiss"
-            style = {styles.buttonDialog}
-            textStyle={styles.buttonTextDialog}
-            onPress={() => {this.props.dismiss()}}
-            />
-        )
-    }
+    /**
+     * render the alert box
+     * @returns alert component
+     * @author KhanhPhung
+     */
     render(){
         return(
             <Dialog

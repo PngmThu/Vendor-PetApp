@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "PetWorld Vendor App",
-    "slug": "petworld-vendor-app",
+    "name": "PetWorldVendor",
+    "slug": "petworldvendor",
     "privacy": "public",
     "sdkVersion": "35.0.0",
     "platforms": [

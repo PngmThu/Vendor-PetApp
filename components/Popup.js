@@ -2,6 +2,10 @@ import Dialog, { DialogFooter, DialogButton, DialogContent, FadeAnimation } from
 import {Text, View, StyleSheet} from "react-native";
 import React from "react";
 
+/**
+ * Popup component
+ * @author KhanhPhung
+ */
 class Popup extends React.Component{
     constructor(props){
         super(props);

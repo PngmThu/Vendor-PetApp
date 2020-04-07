@@ -3,6 +3,10 @@ import { StyleSheet, View, Dimensions, Text } from 'react-native';
 import {SkypeIndicator} from 'react-native-indicators';
 const { width, height } = Dimensions.get('screen');
 
+/**
+ * Loading component
+ * @author KhanhPhung
+ */
 export default class Loader extends React.Component {
   constructor(props) {
     super(props);

@@ -2,6 +2,12 @@ import React from "react";
 import { StyleSheet } from "react-native";
 import { Calendar, CalendarList, Agenda } from 'react-native-calendars';
 
+/**
+ * Calendar component to render calendar which displays information
+ * about vendor schedule
+ * @author KhanhPhung
+ */
+
 class CalendarComponent extends React.Component {
 
     state = {
@@ -18,9 +24,9 @@ class CalendarComponent extends React.Component {
         this.monthChange = this.monthChange.bind(this);
     }
 
-    componentDidMount() {
-    }
-
+    /**
+     * process date data to display marking on the calendar
+     */
     processDate() {
         var bookedDate = this.props.bookedDate;
         var unavailableDate = this.props.unavailableDate;
@@ -38,6 +44,10 @@ class CalendarComponent extends React.Component {
         this.setState({ markedDate })
     }
 
+    /**
+     * change the state of date on the calendar
+     * @param {Date} clickedDate user's chosen date on the calendar
+     */
     updateDate(clickedDate) {
         var markedDate = { ...this.state.markedDate };
         if (this.state.markedDate[clickedDate] && this.state.markedDate[clickedDate].customStyles == unavailable) {
@@ -49,6 +59,10 @@ class CalendarComponent extends React.Component {
         this.setState({ markedDate });
     }
 
+    /**
+     * catch user click event on the calendar
+     * @param {Date} day user's clicked date on the calendar
+     */
     setDate(day) {
         if (!this.state.markedDate[day.dateString] || this.state.markedDate[day.dateString].customStyles != unavailable) {
             this.props.toggleDateStatus(false, day.dateString);
@@ -58,6 +72,9 @@ class CalendarComponent extends React.Component {
         }
     }
 
+    /**
+     * get today date
+     */
     todayDate() {
         let currentDate = new Date();
         let year = currentDate.getFullYear()
@@ -69,10 +86,18 @@ class CalendarComponent extends React.Component {
         return year + "-" + month + "-" + day;
     }
 
+    /**
+     * catch user click event on the calendar and trigger scroll to event in home screen
+     * @param {Date} day user's clicked date on the calendar
+     */
     scrollTo(day) {
         this.props.scrollTo(day.dateString);
     }
 
+    /**
+     * catch change month event on the calendar and trigger to home screen
+     * @param {object} month month parameter object 
+     */
     monthChange(month) {
         let fromTime = new Date(month.year, month.month - 1);
         if (fromTime.getMonth() == 11) {
@@ -85,6 +110,9 @@ class CalendarComponent extends React.Component {
         this.props.monthChange(fromTime, toTime);
     }
 
+    /**
+     * render calendar component
+     */
     render() {
         const theme = {
             calendarBackground: '#rgba(45, 45, 45, 0.8)',

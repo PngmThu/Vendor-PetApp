@@ -7,11 +7,19 @@ import { Block, Text } from 'galio-framework';
 import Icon from './Icon';
 import { argonTheme } from '../constants';
 
+/**
+ * Dropdown component
+ */
 class DropDown extends React.Component {
   state = {
     value: 1,
   }
 
+  /**
+   * handle on select event
+   * @param {number} index index of selected item
+   * @param {string} value value of selected item
+   */
   handleOnSelect = (index, value) => {
     const { onSelect } = this.props;
 
