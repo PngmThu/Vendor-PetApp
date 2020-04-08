@@ -1,6 +1,6 @@
 import React from 'react';
 import { StyleSheet, Dimensions, ScrollView, ImageBackground, View, } from 'react-native';
-import { Block, theme, Text } from 'galio-framework';
+import { Block, Text } from 'galio-framework';
 import Popup from '../components/Popup';
 import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { Button } from 'galio-framework';
@@ -36,16 +36,25 @@ class ScheduleDetails extends React.Component {
     btnAction: false
   }
 
+  // the screen focused (if there was a transition, the transition completed)
   componentDidMount() {
     this.didFocus = this.props.navigation.addListener('willFocus', () => {
       this.retrieveData();
     })
   }
 
+  // remove screen focused
   componentWillUnmount() {
     this.didFocus.remove();
   }
 
+  /**
+   * retrieve booking detail of the service, customer and pet
+   * @param {string} bookingId - this is the booking id to be searched for in the database.
+   * @param {string} customerId - this is the customer id to be searched for to retrieve customer object in the database.
+   * @param {string} petId - this is the id of pet to be retrieved.
+   * @param {string} serviceId - this is the id of a particular service object.
+   */
   retrieveData() {
     this.bookingId = this.props.navigation.state.params.data;
     if (!this.bookingId) {
@@ -79,14 +88,21 @@ class ScheduleDetails extends React.Component {
     })
   }
 
+  // Handler which gets executed on cancel press.
   handleCancel() {
     this.setState({ popUpDialog: true, question: 'Are you sure to cancel this booking', btnAction: false })
   }
 
+  // Handler which gets executed on complete press.
   handleComplete() {
     this.setState({ popUpDialog: true, question: 'Is this booking completed?', btnAction: true })
   }
 
+  /**
+   * allow vendor to update the booking status.
+   * @param {string} bookingId - this is the booking id to be searched for to update booking object in the database.
+   * @param {string} booking - this is a booking object to update the existing booking in the database.
+   */
   updateBooking(bool) {
     if (bool) {
       let booking = { ...this.state.booking }
@@ -106,6 +122,9 @@ class ScheduleDetails extends React.Component {
     this.setState({ popUpDialog: false });
   }
 
+  /**
+  * render ScheduleDetails screen
+  */
   render() {
     const { navigation } = this.props;
 

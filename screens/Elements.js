@@ -8,6 +8,9 @@ import { Button, Select, Icon, Input, Header, Switch } from "../components/";
 
 const { width } = Dimensions.get("screen");
 
+/**
+ * render buttons, text, inputs, switches, tablecell, social and navigation.
+ */
 class Elements extends React.Component {
   state = {
     "switch-1": true,

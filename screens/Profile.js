@@ -54,6 +54,8 @@ class Profile extends React.Component {
     this._keyboardDidShow = this._keyboardDidShow.bind(this);
   }
 
+  // the screen focused (if there was a transition, the transition completed)
+  // detect if user close the keyboard
   componentDidMount(){
     this.didFocus = this.props.navigation.addListener('willFocus', () => {
       this.retrieveData();
@@ -64,15 +66,23 @@ class Profile extends React.Component {
     );
   }
 
+  // remove detecting if user close the keyboard
+  // remove screen focused
   componentWillUnmount(){
     this.didFocus.remove();
     this.keyboardDidShowListener.remove();
   }
 
+  // is fired after the keyboard appears
   _keyboardDidShow(e){
     this.setState({keyboardHeight: e.endCoordinates.height});
   }
 
+  /**
+   * retrieve data of vendor.
+   * @param {string} vendorId - this is the id of the vendor to be retrieve.
+   * @param {string} id - this is the id of vendorLocation.
+   */
   async retrieveData(){
     let vendorId = await this.authAPI.retrieveVendorId();
     
@@ -86,19 +96,34 @@ class Profile extends React.Component {
     })
   }
 
+  /**
+  * vendor logout and navigate to Account screen
+  * clear token
+  */
   async logout(){
     await this.authAPI.clearToken();
     this.props.navigation.navigate('Account');
   }
 
+  /**
+  * vendor click on logout button and display popup
+  */
   clickLogout(){
     this.setState({popUpDialog: true, question: 'Do you want to logout?', popUpType: 1})
   }
 
+  /**
+  * vendor click on update button and display popup
+  */
   clickUpdate(){
     this.setState({popUpDialog: true, question: 'Do you want to update profile?', popUpType: 2})
   }
 
+  /**
+  * Handle update user account.
+  * display relevant Alert
+  * @param {object} vendor - this is the vendor object to be updated.
+  */
   handleUpdateInfo(){
     if(!this.validateInput()){
       return;
@@ -112,6 +137,9 @@ class Profile extends React.Component {
     })
   }
 
+  /**
+  * validate empty input field for name and email address
+  */
   validateInput(){
     if(!this.state.email || !this.state.name){
       Alert.alert('Error', "Input field can not be empty",
@@ -121,6 +149,9 @@ class Profile extends React.Component {
     return true;
   }
 
+  /**
+  * Handle if vendor click on update or logout button
+  */
   handleChoice(bool){
     this.setState({popUpDialog: false})
     if(bool){
@@ -133,6 +164,9 @@ class Profile extends React.Component {
     }
   }
 
+  /**
+  * render Profile screen
+  */
   render() {
     const { navigation } = this.props;
 

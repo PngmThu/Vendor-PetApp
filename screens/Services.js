@@ -22,7 +22,6 @@ class Services extends React.Component {
 
   constructor(props) {
     super(props);
-    //console.log(this.props.navigation.state.params);
     this.logout = this.logout.bind(this);
     this.clickLogout = this.clickLogout.bind(this);
     this.renderCard = this.renderCard.bind(this);
@@ -32,6 +31,7 @@ class Services extends React.Component {
     this.serviceAPI = new ServiceAPI();
   }
 
+  // the screen focused (if there was a transition, the transition completed)
   componentDidMount() {
     this.didFocus = this.props.navigation.addListener('willFocus', () => {
       this.setState({ loading: true }, () => {
@@ -40,9 +40,15 @@ class Services extends React.Component {
     })
   }
 
+  // remove screen focused
   componentWillUnmount(){
     this.didFocus.remove();
   }
+
+  /**
+   * retrieve list of services offered by a vendor
+   * @param {string} vendorId - this is the vendor id to be querried. 
+   */
   async retrieveData() {
     let vendorId = await this.serviceAPI.authAPI.retrieveVendorId();
     this.serviceAPI.getServiceByVendor(vendorId, (res) => {
@@ -53,6 +59,7 @@ class Services extends React.Component {
   register() {
   }
 
+  // popUp if vendor log out
   logout(bool) {
     if (bool) {
       console.log("Logged out!");
@@ -60,18 +67,22 @@ class Services extends React.Component {
     this.setState({ popUpDialog: false })
   }
 
+  // catch if vendor click on the logout button and trigger popup
   clickLogout(event) {
     this.setState({ popUpDialog: true })
   }
 
+  // catch if vendor click on the service and navigate to ServiceInput screen
   updateService(item) {
     this.props.navigation.navigate('ServiceInput', { createNew: false, data: item });
   }
 
+  // catch if vendor click on the create service and navigate to ServiceInput screen
   createService() {
     this.props.navigation.navigate('ServiceInput', { createNew: true, data: null })
   }
 
+  // render Card view for services
   renderCard() {
     var table = [];
     this.state.services.forEach((item, index) => {
@@ -114,6 +125,7 @@ class Services extends React.Component {
     return table
   }
 
+  // render Services screen
   render() {
     const { navigation } = this.props;
 

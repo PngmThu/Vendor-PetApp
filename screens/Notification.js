@@ -3,17 +3,13 @@ import {
   StyleSheet,
   ImageBackground,
   Dimensions,
-  StatusBar,
   KeyboardAvoidingView,
-  Picker,
   View,
   ScrollView,
   TouchableOpacity
 } from "react-native";
-import { Block, Text, theme } from "galio-framework";
-import { argonTheme } from "../constants";
-import { Button, Icon, Input } from "../components";
-import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
+import { Block, Text } from "galio-framework";
+import { Icon } from "../components";
 import Loader from '../components/Loader';
 import NotificationAPI from '../api/NotificationAPI'
 import AuthAPI from '../api/AuthAPI'
@@ -41,8 +37,8 @@ class Notification extends React.Component {
     this.loadMoreData = this.loadMoreData.bind(this);
   }
 
+  // the screen focused (if there was a transition, the transition completed)
   async componentDidMount() {
-
     this.didFocus = this.props.navigation.addListener('willFocus', () => {
       this.setState({ loading: true }, () => {
         this.retrieveData();
@@ -50,6 +46,11 @@ class Notification extends React.Component {
     })
   }
 
+  /**
+   * retrieve all notification object within a time period for a particular vendor.
+   * @param {string} vendorId - this is the customer id to be searched for to retrieve notification object in the database.
+   * @param {string} fromTime - this is the time period to filter the notification objects retrieved.
+  */
   async retrieveData() {
     let vendorId = await this.authAPI.retrieveVendorId();
     let now = new Date();
@@ -59,6 +60,11 @@ class Notification extends React.Component {
     })
   }
 
+  /**
+   * load more notification object within a time period for a particular vendor.
+   * @param {string} vendorId - this is the customer id to be searched for to retrieve notification object in the database.
+   * @param {string} fromTime - this is the time period to filter the notification objects retrieved.
+  */
   async loadMoreData(){
     let vendorId = await this.authAPI.retrieveVendorId();
     this.notificationAPI.getNotificationByVendorFromTime(vendorId, this.lastTime, (notifs) => {
@@ -72,10 +78,15 @@ class Notification extends React.Component {
     })
   }
 
+  // navigate to ScheduleDetails if vendor click on particular notification
   scheduleDetail(index) {
     this.props.navigation.navigate("ScheduleDetails", { data: this.state.notiData[index].bookingId });
   }
 
+  /**
+   * Handle notification data.
+   * @param {string} customerId - this is the customer id to be searched for to retrieve customer object in the database.
+  */
   handleNotiData(notifs) {
     var result = [];
     var count = 0;
@@ -129,6 +140,9 @@ class Notification extends React.Component {
     console.log(this.lastTime);
   }
 
+  /**
+  * render Notification screen
+  */
   render() {
     const { navigation } = this.props;
 

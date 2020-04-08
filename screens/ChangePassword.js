@@ -3,17 +3,15 @@ import {
   StyleSheet,
   ImageBackground,
   Dimensions,
-  StatusBar,
   KeyboardAvoidingView,
   Keyboard,
-  View,
   ScrollView,
   Alert
 } from "react-native";
-import { Block, Text, theme } from "galio-framework";
+import { Block, Text } from "galio-framework";
 import { argonTheme } from "../constants";
 import { Button, Icon, Input } from "../components";
-import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
+import { MaterialIcons } from '@expo/vector-icons';
 import VendorProfileAPI from '../api/VendorProfileAPI';
 import Popup from '../components/Popup';
 const { width, height } = Dimensions.get("screen");
@@ -29,13 +27,18 @@ class ChangePassword extends React.Component {
 
   constructor(props) {
     super(props);
-    //console.log(this.props.navigation.state.params);
     this.clickSave = this.clickSave.bind(this);
     this.updatePwd = this.updatePwd.bind(this);
     this.vendorProfileAPI = new VendorProfileAPI();
     this._keyboardDidShow = this._keyboardDidShow.bind(this);
   }
 
+  /**
+   * to update vendor password and display Alert whether the password is updated successfully or unsuccessfully
+   * @param {string} vendorId - this is the vendor id to be searched for to retrieve vendor object in the database.
+   * @param {string} newPwd - this is the new password to be changed to.
+   * @param {string} oldPwd - this is the old passowrd of the user to be replaced.
+   */
   async updatePwd(bool) {
     if (bool) {
       if (this.validatePwd()) {
@@ -56,21 +59,31 @@ class ChangePassword extends React.Component {
     }
     this.setState({ popUpDialog: false })
   }
+
+  // detect if user close the keyboard
   componentDidMount() {
     this.keyboardDidShowListener = Keyboard.addListener(
       'keyboardDidShow',
       this._keyboardDidShow,
     );
   }
-
+  // remove detecting if user close the keyboard
   componentWillUnmount() {
     this.keyboardDidShowListener.remove();
   }
 
+  // is fired after the keyboard appears
   _keyboardDidShow(e) {
     this.setState({ keyboardHeight: e.endCoordinates.height });
   }
 
+  /**
+   * to validate if vendor new password and re-entered password match and to validate if there are any empty input.
+   * display relevant Alert 
+   * @param {string} rePwd - this is the re-entered new password to be changed to.
+   * @param {string} newPwd - this is the new password to be changed to.
+   * @param {string} oldPwd - this is the old passowrd of the user to be replaced.
+   */
   validatePwd() {
     if (this.state.newPwd != this.state.rePwd) {
       Alert.alert('Error', "New password not match",
@@ -86,10 +99,15 @@ class ChangePassword extends React.Component {
 
     return true;
   }
+
+  // catch vendor click on the save button and trigger popup
   clickSave(event) {
     this.setState({ popUpDialog: true })
   }
 
+  /**
+  * render ChangePassword screen
+  */
   render() {
     const { navigation } = this.props;
 

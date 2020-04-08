@@ -36,6 +36,10 @@ const categories = [
   }
 ];
 
+/**
+ * Display all products name, price and description in Card view
+ */
+
 class Articles extends React.Component {
   renderProduct = (item, index) => {
     const { navigation } = this.props;
