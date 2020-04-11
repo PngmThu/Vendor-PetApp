@@ -5,10 +5,9 @@ import {
   Dimensions,
   Alert,
   KeyboardAvoidingView,
-  Image,
-  View
+  Image
 } from "react-native";
-import { Block, Checkbox, Text, theme } from "galio-framework";
+import { Block, Text } from "galio-framework";
 
 import { Button, 
   Icon, 
@@ -32,6 +31,11 @@ class ResetPassword extends React.Component {
     this.forgetPwd = this.forgetPwd.bind(this);
   }
 
+  /**
+   * for vendor to reset their password.
+   * new password will be send to their registered email address
+   * * @param {string} email - this is the email address of vendor.
+   */
   forgetPwd(){
     this.authAPI.forgetPassword(this.state.email, (res) => {
       if(res == true){
@@ -45,6 +49,9 @@ class ResetPassword extends React.Component {
     })
   }
 
+  /**
+  * render ForgetPassword screen
+  */
   render() {
     const { navigation } = this.props;
 

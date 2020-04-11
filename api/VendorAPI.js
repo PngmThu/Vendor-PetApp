@@ -8,6 +8,11 @@ export default class VendorAPI{
         this.authAPI = new AuthAPI();
     }
 
+    /**
+     * create a new vendor object.
+     * @param {object} vendor - this is vendor object with the attributes of vendor to be saved to database.
+     * @param {function} callback - this is callback function to catch the result.
+     */
     async createVendor(vendor, callback){
         const url =this.globals.serverHost + '/api/account/vendor';
 
@@ -32,6 +37,10 @@ export default class VendorAPI{
         })
     }
 
+    /**
+     * retrieve the list of locations of all vendors.
+     * @param {function} callback - this is callback function to catch the result.
+     */
     getVendorLocation(callback){
         const url = this.globals.serverHost + '/api/vendorLocation';
         
@@ -50,6 +59,11 @@ export default class VendorAPI{
         })
     }
 
+    /**
+     * retrieve vendor location by vendorLocation id.
+     * @param {string} id - this is the id of vendorLocation.
+     * @param {function} callback - this is callback function to catch the result.
+     */
     async getVendorLocationById(id, callback){
         const url = this.globals.serverHost + '/api/vendorLocation/vendor/' + id;
         

@@ -3,9 +3,7 @@ import {
   StyleSheet,
   ImageBackground,
   Dimensions,
-  StatusBar,
   KeyboardAvoidingView,
-  Picker,
   View,
   ScrollView,
   TextInput,
@@ -14,11 +12,10 @@ import {
   Image,
   Keyboard
 } from "react-native";
-import { Block, Text, theme } from "galio-framework";
+import { Block, Text } from "galio-framework";
 import { argonTheme } from "../constants";
 import { Button, Icon, Input } from "../components";
 import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
-import Notification from '../models/NotificationModel';
 import ToggleSwitch from 'toggle-switch-react-native';
 import Popup from '../components/Popup';
 import ServiceAPI from '../api/ServiceAPI';
@@ -46,6 +43,8 @@ class ServiceInput extends React.Component {
     this._keyboardDidShow = this._keyboardDidShow.bind(this);
   }
 
+  // the screen focused (if there was a transition, the transition completed)
+  // detect if user close the keyboard
   componentDidMount(){
     this.focusListener = this.props.navigation.addListener('didFocus', () => {
       this.getPropData()
@@ -57,15 +56,24 @@ class ServiceInput extends React.Component {
     );
   }
 
+  // remove detecting if user close the keyboard
+  // remove screen focused
   componentWillUnmount () {
     this.focusListener.remove();
     this.keyboardDidShowListener.remove();
   }
 
+  // is fired after the keyboard appears
   _keyboardDidShow(e){
     this.setState({keyboardHeight: e.endCoordinates.height});
   }
 
+  /**
+   * get the name, price and description of the service
+   * @param {string} name - this is the name of the service.
+   * @param {string} price - this is the cost of the service
+   * @param {string} description - this is the description of the service.
+   */
   getPropData(){
     var params = this.props.navigation.state.params;
     if(params){
@@ -83,12 +91,22 @@ class ServiceInput extends React.Component {
     }
   }
 
+  // catch vendor click on the save button and trigger popup
   clickSave(){
     if(this.validateInput()){
       this.setState({popUpDialog: true})
     }
   }
 
+  /**
+   * confirm if vendor create new or update existing services.
+   * display relevant Alert for create and update service.
+   * @param {string} name - this is the name of the service.
+   * @param {string} price - this is the cost of the service
+   * @param {string} description - this is the description of the service.
+   * @param {string} vendorId - this is the vendor id to be searched for to retrieve vendor object in the database.
+   * @param {string} serviceId - this is the id of a particular service object.
+   */
   async confirm(bool){
     if(bool){
       if(this.state.createNew){
@@ -131,7 +149,10 @@ class ServiceInput extends React.Component {
     }
     this.setState({popUpDialog: false, edit: false})
   }
-
+  
+  /**
+   * validate if vendor enters correct name and price of service
+   */
   validateInput(){
     if(isNaN(this.state.price) || this.state.price <= 0){
       Alert.alert('Error', "Invalid price input",
@@ -147,6 +168,9 @@ class ServiceInput extends React.Component {
     return true
   }
 
+  /**
+  * render ServiceInput screen
+  */
   render() {
     const { navigation } = this.props;
     if(this.state.createNew || this.state.edit){

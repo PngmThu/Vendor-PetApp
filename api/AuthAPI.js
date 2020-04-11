@@ -8,6 +8,12 @@ export default class AuthAPI{
         this.globals = new Globals();
     }
 
+    /**
+    * login verification.
+    * @param {string} email - this is email of user.
+    * @param {string} password - this is user's password.
+    * @param {function} callback- this is callback function to catch the result.
+    */
     login(email, password, callback){
         const url = this.globals.serverHost + '/api/auth/login/vendor';
 
@@ -33,6 +39,11 @@ export default class AuthAPI{
         })
     }
 
+    /**
+     * send reset password.
+     * @param {string} email - this is email of user.
+     * @param {function} callback- this is callback function to catch the result.
+     */
     forgetPassword(email, callback){
         const url = this.globals.serverHost + '/api/auth/password/vendor';
 
@@ -55,6 +66,11 @@ export default class AuthAPI{
         })
     }
 
+    /**
+     * tag device id to user id
+     * @param {string} token - this is the token for user login session.
+     * @param {string} userId - this is the id user enters for registeration.
+     */
     async registerDevice(token, userId){
         const url = this.globals.serverHost + '/api/serviceNotification';
         let deviceId = await Notifications.getExpoPushTokenAsync();
@@ -74,6 +90,10 @@ export default class AuthAPI{
         })
     }
 
+    /**
+     * store id of vendor
+     * @param {string} id - this is the vendor id.
+     */
     async storeVendorId(id){
         try{
             await AsyncStorage.setItem('id', id);
@@ -83,6 +103,9 @@ export default class AuthAPI{
         }
     }
 
+    /**
+     * retrieve id of vendor
+     */
     async retrieveVendorId(){
         try {
             const value = await AsyncStorage.getItem('id');
@@ -97,6 +120,10 @@ export default class AuthAPI{
         }
     }
 
+    /**
+     * store the token for login session.
+     * @param {string} token - this is the token for user login session.
+     */
     async storeToken(token){
         try{
             await AsyncStorage.setItem('token', token);
@@ -106,6 +133,9 @@ export default class AuthAPI{
         }
     }
 
+    /**
+     * retrieve the token for login session.
+     */
     async retrieveToken(){
         try {
             const value = await AsyncStorage.getItem('token');
@@ -120,6 +150,9 @@ export default class AuthAPI{
         }
     }
 
+    /**
+     * clear token.
+     */
     async clearToken(){
         await AsyncStorage.removeItem('token');
         await AsyncStorage.removeItem('id');

@@ -11,13 +11,13 @@ import {
   Alert,
   Keyboard
 } from "react-native";
-import { Block, Checkbox, theme } from "galio-framework";
+import { Block } from "galio-framework";
 import {
   Button,
   Icon,
-  Input, Select
+  Input
 } from "../components";
-import { Images, argonTheme } from "../constants";
+import { argonTheme } from "../constants";
 import VendorAPI from '../api/VendorAPI';
 import { MaterialIcons } from '@expo/vector-icons';
 import Loader from '../components/Loader';
@@ -37,6 +37,8 @@ class Register extends React.Component {
     this._keyboardDidShow = this._keyboardDidShow.bind(this);
   }
 
+  // the screen focused (if there was a transition, the transition completed)
+  // detect if user close the keyboard
   componentDidMount() {
     this.didFocus = this.props.navigation.addListener('willFocus', () => {
       this.setState({ loading: true }, () => {
@@ -50,6 +52,8 @@ class Register extends React.Component {
     );
   }
 
+  // remove detecting if user close the keyboard
+  // remove screen focused
   componentWillUnmount () {
     this.didFocus.remove();
     this.keyboardDidShowListener.remove();
@@ -67,16 +71,23 @@ class Register extends React.Component {
     keyboardHeight: 0
   }
 
+  // is fired after the keyboard appears
   _keyboardDidShow(e){
     this.setState({keyboardHeight: e.endCoordinates.height});
   }
 
+  /**
+   * retrieve the list of locations of all vendors.
+   */
   retrieveData() {
     this.vendorAPI.getVendorLocation(res => {
       this.setState({ vendorLocations: res, loading: false })
     })
   }
 
+  /** Handler which gets executed on register press.
+   * validate if input field are empty and password mismatch
+   */
   handleRegister() {
     if (!this.state.email || !this.state.name || !this.state.address || !this.state.password) {
       Alert.alert('Error', "Input field can not be empty",
@@ -109,6 +120,9 @@ class Register extends React.Component {
     })
   }
 
+  /**
+  * render picker for vendor location
+  */
   renderPickerItem() {
     let table = []
     for (var i = 0; i < this.state.vendorLocations.length; i++) {
@@ -119,6 +133,9 @@ class Register extends React.Component {
     return table;
   }
 
+  /**
+  * render picker for vendor location
+  */
   renderPicker() {
     return (
       <Picker
@@ -148,6 +165,9 @@ class Register extends React.Component {
 
   }
 
+  /**
+  * render Register screen
+  */
   render() {
     const { navigation } = this.props;
     if (this.state.loading) {

@@ -2,6 +2,7 @@ import React from 'react';
 import Loader from '../components/Loader';
 import AuthAPI from '../api/AuthAPI';
 import {View} from 'react-native';
+
 export default class AuthLoadingScreen extends React.Component {
 
     constructor(props){

@@ -3,13 +3,12 @@ import {
   StyleSheet,
   ImageBackground,
   Dimensions,
-  StatusBar,
   KeyboardAvoidingView,
   Image,
   Keyboard,
   Alert
 } from "react-native";
-import { Block, Checkbox, Text, theme } from "galio-framework";
+import { Block, Text } from "galio-framework";
 
 import {
   Button,
@@ -19,7 +18,6 @@ import {
 import { Images, argonTheme } from "../constants";
 import { TouchableOpacity, ScrollView } from "react-native-gesture-handler";
 
-import { Avatar } from 'react-native-elements';
 import AuthAPI from '../api/AuthAPI';
 import Loader from '../components/Loader';
 const { width, height } = Dimensions.get("screen");
@@ -41,6 +39,7 @@ class Login extends React.Component {
     this._keyboardDidShow = this._keyboardDidShow.bind(this);
   }
 
+  // detect if user close the keyboard
   componentDidMount() {
     this.keyboardDidShowListener = Keyboard.addListener(
       'keyboardDidShow',
@@ -48,14 +47,22 @@ class Login extends React.Component {
     );
   }
 
+  // remove detecting if user close the keyboard
   componentWillUnmount() {
     this.keyboardDidShowListener.remove();
   }
   
+  // is fired after the keyboard appears
   _keyboardDidShow(e) {
     this.setState({ keyboardHeight: e.endCoordinates.height });
   }
 
+  /**
+    * for vendor to login into the system.
+    * display Alert whether vendor lofin successfully or not.
+    * @param {string} email - this is email of vendor.
+    * @param {string} password - this is vendor's password.
+    */
   login() {
     this.setState({ loading: true })
     this.authAPI.login(this.state.email, this.state.password, (res) => {
@@ -70,6 +77,9 @@ class Login extends React.Component {
     })
   }
 
+  /**
+  * render Login screen
+  */
   render() {
     const { navigation } = this.props;
     if (this.state.loading) {

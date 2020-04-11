@@ -1,6 +1,6 @@
 import React from 'react';
 import { StyleSheet, Dimensions, ScrollView, ImageBackground, View, TouchableOpacity, Alert } from 'react-native';
-import { Block, theme, Text } from 'galio-framework';
+import { Block, Text } from 'galio-framework';
 import Calendar from '../components/Calendar';
 import Popup from '../components/Popup';
 import Loader from '../components/Loader';
@@ -9,7 +9,7 @@ import ScheduleAPI from '../api/ScheduleAPI';
 import BookingAPI from '../api/BookingAPI';
 import VendorModel from '../models/VendorModel';
 import ServiceAPI from '../api/ServiceAPI';
-import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 const { width, height } = Dimensions.get('screen');
 
@@ -46,6 +46,7 @@ class Home extends React.Component {
     scrollDate: [],
   }
 
+  // the screen focused (if there was a transition, the transition completed)
   componentDidMount(){
     this.didFocus = this.props.navigation.addListener('willFocus', () => {
       if(!this.lastFromTime ){
@@ -57,10 +58,12 @@ class Home extends React.Component {
     })
   }
 
+  // remove screen focused
   componentWillUnmount(){
     this.didFocus.remove();
   }
 
+  // query the current month
   queryCurrentMonth(){
     let current = new Date();
     let currentYear = current.getFullYear();
@@ -77,10 +80,12 @@ class Home extends React.Component {
     this.retrieveData(fromTime, toTime);
   }
 
+  // navigate to ScheduleDetails for selected date
   scheduleDetail(index){
     this.props.navigation.navigate("ScheduleDetails", {data: this.state.bookingData[index]._id});
   }
 
+  //popup for marking date available or unavailable
   toggleDateStatus(marked, date){
 
     this.setState({clickedDate: date});
@@ -93,6 +98,13 @@ class Home extends React.Component {
     this.setState({popUpDialog: true});
   }
 
+  /**
+     * mark a date as unavailable by creating the date and vendor as attributes of a schedule object.
+     * @param {date} date - this is the date to be marked unavailable.
+     * 
+     * delete an available date to make a data available.
+     * @param {string} id - this is the id of schedule object to be deleted.
+     */
   async dateStatusChoice(bool){
 
     if(bool){
@@ -128,6 +140,12 @@ class Home extends React.Component {
     this.setState({popUpDialog: false});
   }
 
+  /**
+   * retrieve booking data
+   * @param {string} vendorId - this is the vendor id to be searched for to retrieve booking object in the database.
+   * @param {string} fromTime - this is the start time period to filter the bookings objects retrieved.
+   * @param {string} toTime - this is the end time period to filter the bookings objects retrieved.
+  */
   async retrieveData(fromTime, toTime){
     this.lastFromTime = fromTime;
     this.lastToTime = toTime;
@@ -180,6 +198,7 @@ class Home extends React.Component {
     })
   }
 
+  // get the day, month and year.
   parseDate(time){
     let month = time.getMonth() < 9 ? "0" + (time.getMonth() + 1) : (time.getMonth() + 1);
     let date = time.getDate() < 9 ? "0" + time.getDate() : time.getDate();
@@ -187,6 +206,10 @@ class Home extends React.Component {
     return parsedDate;
   }
 
+  /**
+     * render TimeSchedule by index (time)
+     * @param {time} index booking timing
+     */
   renderTimeSchedule(index){
     let table = [];
     let lastDate = this.state.bookingData[index].time;
@@ -216,6 +239,10 @@ class Home extends React.Component {
     return table
   }
 
+  /**
+     * render DaySchedule by month
+     * @param {Date} month user's clicked month on the calendar
+     */
   renderDaySchedule(month){
     let table = [];
     let lastDate = new Date('0000-01-01');
@@ -251,6 +278,9 @@ class Home extends React.Component {
     return table
   }
 
+  /**
+     * compare date1 and date2
+     */
   compareDate(date1, date2){
     if(date1.getMonth() == date2.getMonth() && date1.getDate() == date2.getDate() && date1.getFullYear() == date2.getFullYear()){
       return true;
@@ -259,6 +289,10 @@ class Home extends React.Component {
     return false;
   }
 
+  /**
+     * catch user click event on the calendar and trigger scroll to event in home screen
+     * @param {Date} day user's clicked date on the calendar
+     */
   scrollTo(day){
     let counter = 0;
 
@@ -275,6 +309,9 @@ class Home extends React.Component {
     this.scrollview_ref.scrollTo({ x: 0, y: this.scrollPos[counter], animated: true })
   }
 
+  /**
+  * render Home screen
+  */
   render() {
     const { navigation } = this.props;
 
