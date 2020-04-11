@@ -190,7 +190,6 @@ class Home extends React.Component {
   renderTimeSchedule(index){
     let table = [];
     let lastDate = this.state.bookingData[index].time;
-
     for(var i = index; i < this.state.bookingData.length; i++){
       let time = this.state.bookingData[i].time;
       
@@ -198,10 +197,16 @@ class Home extends React.Component {
         break;
       }
 
+      var service = this.state.servicesData.find( v => { 
+        return v._id == this.state.bookingData[i].serviceId
+      })
+
       table.push(
         <TouchableOpacity key={i} style={styles.leftDetail} onPress={this.scheduleDetail.bind(this, i)}>
           <Text style={styles.time}>{time.getHours()}:{time.getMinutes()}</Text>
-          <Text style={styles.service}>{this.state.servicesData.find( v => { return v._id == this.state.bookingData[i].serviceId}).name}</Text>
+          <Text style={styles.service}>
+            {service ? service.name: null}
+            </Text>
           <MaterialCommunityIcons name={iconStatus[this.state.bookingData[i].status]} 
             size={22} style={{...styles.statusIcon}} color={iconColor[this.state.bookingData[i].status]}/>
         </TouchableOpacity>
