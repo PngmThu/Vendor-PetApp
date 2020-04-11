@@ -120,7 +120,7 @@ class Services extends React.Component {
     return (
       <Block center style={styles.home}>
         <ImageBackground
-          source={require("../assets/imgs/galaxy_bg.jpg")}
+          source={require("../assets/imgs/background2.gif")}
           style={{ width, height, zIndex: 1 }}
         >
 
