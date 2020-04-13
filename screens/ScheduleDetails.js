@@ -150,7 +150,7 @@ class ScheduleDetails extends React.Component {
     return (
       <Block flex center style={styles.home}>
         <ImageBackground
-          source={require("../assets/imgs/galaxy_bg.jpg")}
+          source={require("../assets/imgs/galaxy_bg.png")}
           style={{ width, height, zIndex: 1 }}
         >
           <Popup visible={this.state.popUpDialog} choice={this.updateBooking} question={this.state.question} />
@@ -243,7 +243,7 @@ class ScheduleDetails extends React.Component {
                 </View>
 
                 <View style={styles.row}>
-                  <Text style={styles.field}>status:
+                  <Text style={styles.field}>Status:
                       <Text style={styles.value}> {this.state.booking.status}</Text>
                   </Text>
                 </View>

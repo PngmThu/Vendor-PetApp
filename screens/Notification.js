@@ -153,7 +153,7 @@ class Notification extends React.Component {
     return (
       <Block flex center style={styles.home}>
         <ImageBackground
-          source={require("../assets/imgs/galaxy_bg.jpg")}
+          source={require("../assets/imgs/galaxy_bg.png")}
           style={{ width, height, zIndex: 1 }}
         >
 

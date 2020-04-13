@@ -184,10 +184,10 @@ class Profile extends React.Component {
     return (
       <Block flex center style={styles.home}>
         <ImageBackground
-          source={require("../assets/imgs/galaxy_bg.jpg")}
+          source={require("../assets/imgs/galaxy_bg.png")}
           style={{ width, height, zIndex: 1 }}
         >
-        
+      
         <Popup visible={this.state.popUpDialog} choice={this.handleChoice} question={this.state.question}/> 
         <Block style={{position: 'absolute', top: 0}}>
             <ImageBackground source={require("../assets/imgs/Schedule1.png")} resizeMode='contain' style={styles.headerImage}/>

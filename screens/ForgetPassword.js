@@ -61,7 +61,7 @@ class ResetPassword extends React.Component {
         {/* <StatusBar hidden /> */}
         
         <ImageBackground
-          source={require("../assets/imgs/galaxy_bg.jpg")}
+          source={require("../assets/imgs/galaxy_bg.png")}
           style={{ width, height, zIndex: 1}}
         >
           {/* <Block flex={0.4} middle > */}
